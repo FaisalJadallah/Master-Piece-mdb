@@ -1,143 +1,6 @@
-
-// import Navbar from "../navbar/Navbar";
-// import React, { useState } from "react";
-// import axios from "axios";
-//       <Navbar />
-// const Login = () => {
-//  const [email, setEmail] = useState("");
-//  const [password, setPassword] = useState("");
-//  const [message, setMessage] = useState("");
-
-
-//    const handleSubmit = async (e) => {
-//      e.preventDefault();
-//      try {
-//        const response = await axios.post(
-//          "http://localhost:5000/api/users/login",
-//          {
-//            email,
-//            password,
-//          },
-//          {
-//            withCredentials: true, // لضمان إرسال الكوكيز
-//          }
-//        );
-//        setMessage(response.data.message); // سيتم عرض رسالة النجاح
-//      } catch (error) {
-//        setMessage(error.response.data.message); // سيتم عرض رسالة الخطأ
-//      }
-//    };
-
-
-
-//   return (
-//     <>
-//       <div className="min-h-screen flex items-center justify-center bg-[#EFF5F5] p-4">
-//         <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
-//           {/* Image Section - Full Size (Left side to match registration) */}
-//           <div className="w-full md:w-1/2 relative h-64 md:h-auto order-2 md:order-1">
-//             <img
-//               src="https://www.cairo24.com/Upload/libfiles/79/4/943.jpg"
-//               alt="Login"
-//               className="absolute inset-0 w-full h-full object-cover"
-//             />
-//           </div>
-
-//           {/* Form Section (Right side to match registration) */}
-//           <div className="w-full md:w-1/2 p-8 order-1 md:order-2">
-//             <h2 className="text-3xl font-bold text-[#497174] mb-6">
-//               Welcome Back
-//             </h2>
-//             <form className="space-y-6" onSubmit={handleSubmit}>
-//               <div className="space-y-2">
-//                 <label
-//                   htmlFor="email"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Email Address
-//                 </label>
-//                 <input
-//                   type="email"
-//                   id="email"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your email"
-//                   value={email}
-//                   onChange={(e) => setEmail(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="space-y-2">
-//                 <label
-//                   htmlFor="password"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   id="password"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your password"
-//                   value={password}
-//                   onChange={(e) => setPassword(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="flex items-center justify-between">
-//                 <div className="flex items-center">
-//                   <input
-//                     type="checkbox"
-//                     id="remember"
-//                     className="mr-2 h-4 w-4 accent-[#EB6440]"
-//                   />
-//                   <label htmlFor="remember" className="text-[#497174]">
-//                     Remember me
-//                   </label>
-//                 </div>
-//                 <a
-//                   href="#"
-//                   className="text-[#EB6440] font-medium hover:underline"
-//                 >
-//                   Forgot Password?
-//                 </a>
-//               </div>
-
-//               <button
-//                 type="submit"
-//                 className="w-full py-3 px-4 bg-[#EB6440] text-white font-medium rounded-md hover:bg-opacity-90 transition duration-300 shadow-md"
-//               >
-//                 Sign In
-//               </button>
-
-//               <p className="text-center text-[#497174]">
-//                 Don't have an account?{" "}
-//                 <a
-//                   href="#"
-//                   className="text-[#EB6440] font-medium hover:underline"
-//                 >
-//                   Create Account
-//                 </a>
-//               </p>
-//             </form>
-//             {message && (
-//               <p className="mt-4 text-center text-sm font-medium text-gray-800">
-//                 {message}
-//               </p>
-//             )}{" "}
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Login;
-import Navbar from "../navbar/Navbar";
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -148,130 +11,111 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true, // لضمان إرسال الكوكيز
-        }
-      );
-      setMessage(response.data.message); // عرض رسالة النجاح
+      const response = await axios.post("http://localhost:5000/users/login", {
+        email,
+        password,
+      });
 
-      // إذا كان الرد ناجحًا، انتقل إلى صفحة الهوم
-      if (response.status === 200) {
-        navigate("/"); // تغيير "/home" إلى المسار الخاص بصفحة الهوم
+      setMessage(response.data.message);
+      if (response.data.message === "Logged in successfully") {
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
       }
     } catch (error) {
-      setMessage(error.response.data.message); // عرض رسالة الخطأ
+      setMessage(
+        error.response
+          ? error.response.data.message
+          : "Login failed. Please try again."
+      );
     }
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-[#EFF5F5] p-4">
-        <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Image Section - Full Size (Left side to match registration) */}
-          <div className="w-full md:w-1/2 relative h-64 md:h-auto order-2 md:order-1">
-            <img
-              src="https://www.cairo24.com/Upload/libfiles/79/4/943.jpg"
-              alt="Login"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Form Section (Right side to match registration) */}
-          <div className="w-full md:w-1/2 p-8 order-1 md:order-2">
-            <h2 className="text-3xl font-bold text-[#497174] mb-6">
-              Welcome Back
-            </h2>
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-[#497174] font-medium"
-                >
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="block text-[#497174] font-medium"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    className="mr-2 h-4 w-4 accent-[#EB6440]"
-                  />
-                  <label htmlFor="remember" className="text-[#497174]">
-                    Remember me
-                  </label>
-                </div>
-                <a
-                  href="#"
-                  className="text-[#EB6440] font-medium hover:underline"
-                >
-                  Forgot Password?
-                </a>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 px-4 bg-[#EB6440] text-white font-medium rounded-md hover:bg-opacity-90 transition duration-300 shadow-md"
-              >
-                Sign In
-              </button>
-
-              <p className="text-center text-[#497174]">
-                Don't have an account?{" "}
-                <Link to="/Register">
-                  <a
-                    href="#"
-                    className="text-[#EB6440] font-medium hover:underline"
-                  >
-                    Create Account
-                  </a>
-                </Link>
-              </p>
-            </form>
-            {message && (
-              <p className="mt-4 text-center text-sm font-medium text-gray-800">
-                {message}
-              </p>
-            )}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4">
+      <div className="flex flex-col md:flex-row w-full max-w-5xl bg-[#1e1e2f] rounded-2xl shadow-2xl overflow-hidden relative border border-purple-700">
+        {/* Left Side */}
+        <div className="w-full md:w-1/2 p-8 bg-gradient-to-br from-purple-800 to-purple-600 flex flex-col justify-center text-white relative">
+          <h2 className="text-4xl font-extrabold mb-6 drop-shadow-[0_0_10px_#ffffff66]">Welcome Back</h2>
+          <p className="text-purple-100 text-lg mb-8">
+            Ready to continue your journey? Log in and get back in the game.
+          </p>
+          <div className="flex space-x-3">
+            <div className="h-2 w-16 bg-white rounded-full opacity-50"></div>
+            <div className="h-2 w-8 bg-white rounded-full opacity-30"></div>
+            <div className="h-2 w-4 bg-white rounded-full opacity-20"></div>
           </div>
         </div>
+
+        {/* Right Side - Form */}
+        <div className="w-full md:w-1/2 p-8 md:p-12 bg-[#1e1e2f] text-white">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-purple-400">Login to Your Account</h2>
+            <p className="text-gray-400 mt-2">Access your gaming world</p>
+          </div>
+
+          {message && (
+            <div
+              className={`mb-6 p-3 rounded-lg text-sm ${
+                message.includes("successfully")
+                  ? "bg-green-600 text-white"
+                  : "bg-red-600 text-white"
+              }`}
+            >
+              {message}
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label className="block mb-1 text-purple-300">Email</label>
+              <input
+                type="email"
+                className="w-full px-4 py-3 bg-[#2c2c3e] text-white border border-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 text-purple-300">Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 bg-[#2c2c3e] text-white border border-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                className="mr-2 h-5 w-5 border-purple-500 focus:ring-purple-500 bg-[#2c2c3e]"
+              />
+              <label className="text-sm text-gray-400">Remember me</label>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-lg transition duration-300 shadow-[0_0_10px_#8B5DFF]"
+            >
+              Log In
+            </button>
+
+            <p className="text-center text-sm text-gray-400 mt-4">
+              Don’t have an account?{" "}
+              <a href="/register" className="text-purple-300 hover:underline">
+                Create one
+              </a>
+            </p>
+          </form>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

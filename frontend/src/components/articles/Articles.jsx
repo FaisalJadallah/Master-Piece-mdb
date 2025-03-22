@@ -10,8 +10,8 @@ const Articles = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [viewMode, setViewMode] = useState('');
   // const [comments, setComments] = useState({});
- const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+//  const [isLiked, setIsLiked] = useState(false);
+//   const [isBookmarked, setIsBookmarked] = useState(false);
   const [articles, setArticles] = useState([]);
 
 
@@ -73,14 +73,14 @@ const Articles = () => {
 
   });
 
-    // Toggle like/bookmark
-    const toggleLike = () => {
-      setIsLiked(!isLiked);
-    };
+    // // Toggle like/bookmark
+    // const toggleLike = () => {
+    //   setIsLiked(!isLiked);
+    // };
   
-    const toggleBookmark = () => {
-      setIsBookmarked(!isBookmarked);
-    };
+    // const toggleBookmark = () => {
+    //   setIsBookmarked(!isBookmarked);
+    // };
   // Get category icon
   const getCategoryIcon = (categoryName) => {
     const category = categories.find(cat => cat.name === categoryName);

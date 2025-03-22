@@ -1,326 +1,4 @@
-// import { useState } from "react";
-// import Navbar from "../navbar/Navbar";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-
-// const Register = () => {
-// const [username, setUsername] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [message, setMessage] = useState("");
-//   const navigate = useNavigate();
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       console.log("Sending data:", { username, email, password }); // تسجيل البيانات المرسلة
-
-//       const response = await axios.post(
-//         "http://localhost:5000/api/users/register",
-//         {
-//           username,
-//           email,
-//           password,
-//         }
-//       );
-
-//       console.log("Response:", response.data); // تسجيل استجابة الخادم
-
-//       setMessage(response.data.message);
-//       if (response.data.message === "User registered successfully") {
-//         navigate("/login");
-//       }
-//     } catch (error) {
-//       console.error("Registration error:", error); // تسجيل تفاصيل الخطأ
-//       setMessage(
-//         error.response
-//           ? error.response.data.message
-//           : "Registration failed. Please try again."
-//       );
-//     }
-//   };
-
-//   return (
-//     <>
-//       <Navbar />
-//       <div className="min-h-screen flex items-center justify-center bg-[#EFF5F5] p-4">
-//         <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
-//           {/* Image Section - Full Size (Left side) */}
-//           <div className="w-full md:w-1/2 relative h-64 md:h-auto order-2 md:order-1">
-//             <img
-//               src="https://www.sqorebda3.com/vb/attachments/16229/"
-//               alt="Registration"
-//               className="absolute inset-0 w-full h-full object-cover"
-//             />
-//           </div>
-
-//           {/* Form Section (Right side) */}
-//           <div className="w-full md:w-1/2 p-8 order-1 md:order-2">
-//             <h2 className="text-3xl font-bold text-[#497174] mb-6">
-//               Create an Account
-//             </h2>
-
-//             <form className="space-y-6" onSubmit={handleSubmit}>
-//               <div className="space-y-2">
-//                 <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
-//                 {message && <div className="mb-4 text-red-500">{message}</div>}
-//                 <label
-//                   htmlFor="name"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Full Name
-//                 </label>
-//                 <input
-//                   type="text"
-//                   id="name"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your full name"
-//                   value={username}
-//                   onChange={(e) => setUsername(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="space-y-2">
-//                 <label
-//                   htmlFor="email"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Email Address
-//                 </label>
-//                 <input
-//                   type="email"
-//                   id="email"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your email"
-//                   value={email}
-//                   onChange={(e) => setEmail(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="space-y-2">
-//                 <label
-//                   htmlFor="password"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   id="password"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your password"
-//                   value={password}
-//                   onChange={(e) => setPassword(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="flex items-center">
-//                 <input
-//                   type="checkbox"
-//                   id="terms"
-//                   className="mr-2 h-4 w-4 accent-[#EB6440]"
-//                   required
-//                 />
-//                 <label htmlFor="terms" className="text-[#497174]">
-//                   I agree to the Terms and Conditions
-//                 </label>
-//               </div>
-
-//               <button
-//                 type="submit"
-//                 className="w-full py-3 px-4 bg-[#EB6440] text-white font-medium rounded-md hover:bg-opacity-90 transition duration-300 shadow-md"
-//               >
-//                 Create Account
-//               </button>
-
-//               <p className="text-center text-[#497174]">
-//                 Already have an account?{" "}
-//                 <a
-//                   href="#"
-//                   className="text-[#EB6440] font-medium hover:underline"
-//                 >
-//                   Sign In
-//                 </a>
-//               </p>
-//             </form>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Register;
-
-
-// import { useState } from "react";
-// import Navbar from "../navbar/Navbar";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-
-// const Register = () => {
-//   const [username, setUsername] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [message, setMessage] = useState("");
-//   const navigate = useNavigate();
-// const[role,setRole]=useState("")
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       console.log("Sending data:", { username, email, password,role });
-
-//       const response = await axios.post(
-//         "http://localhost:5000/api/users/register",
-//         { username, email, password,role }
-//       );
-
-//       console.log("Response:", response.data);
-
-//       setMessage(response.data.message);
-//       if (response.data.message === "User registered successfully") {
-//         navigate("/login");
-//       }
-//     } catch (error) {
-//       console.error("Registration error:", error);
-//       setMessage(
-//         error.response
-//           ? error.response.data.message
-//           : "Registration failed. Please try again."
-//       );
-//     }
-//   };
-
-//   return (
-//     <>
-//       <Navbar />
-//       <div className="min-h-screen flex items-center justify-center bg-[#EFF5F5] p-4">
-//         <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
-//           {/* Image Section */}
-//           <div className="w-full md:w-1/2 relative h-64 md:h-auto order-2 md:order-1">
-//             <img
-//               src="https://via.placeholder.com/600x400" // استبدل الرابط بصورة صالحة
-//               alt="Registration"
-//               className="absolute inset-0 w-full h-full object-cover"
-//             />
-//           </div>
-
-//           {/* Form Section */}
-//           <div className="w-full md:w-1/2 p-8 order-1 md:order-2">
-//             <h2 className="text-3xl font-bold text-[#497174] mb-6">
-//               Create an Account
-//             </h2>
-
-//             <form className="space-y-6" onSubmit={handleSubmit}>
-//               <div className="space-y-2">
-//                 <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
-//                 {message && (
-//                   <div
-//                     className={`mb-4 ${
-//                       message.includes("successfully")
-//                         ? "text-green-500"
-//                         : "text-red-500"
-//                     }`}
-//                   >
-//                     {message}
-//                   </div>
-//                 )}
-
-//                 <label
-//                   htmlFor="name"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Full Name
-//                 </label>
-//                 <input
-//                   type="text"
-//                   id="name"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your full name"
-//                   value={username}
-//                   onChange={(e) => setUsername(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="space-y-2">
-//                 <label
-//                   htmlFor="email"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Email Address
-//                 </label>
-//                 <input
-//                   type="email"
-//                   id="email"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your email"
-//                   value={email}
-//                   onChange={(e) => setEmail(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="space-y-2">
-//                 <label
-//                   htmlFor="password"
-//                   className="block text-[#497174] font-medium"
-//                 >
-//                   Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   id="password"
-//                   className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-//                   placeholder="Enter your password"
-//                   value={password}
-//                   onChange={(e) => setPassword(e.target.value)}
-//                   required
-//                 />
-//               </div>
-
-//               <div className="flex items-center">
-//                 <input
-//                   type="checkbox"
-//                   id="terms"
-//                   className="mr-2 h-4 w-4 accent-[#EB6440]"
-//                   required
-//                 />
-//                 <label htmlFor="terms" className="text-[#497174]">
-//                   I agree to the Terms and Conditions
-//                 </label>
-//               </div>
-
-//               <button
-//                 type="submit"
-//                 className="w-full py-3 px-4 bg-[#EB6440] text-white font-medium rounded-md hover:bg-opacity-90 transition duration-300 shadow-md"
-//               >
-//                 Create Account
-//               </button>
-
-//               <p className="text-center text-[#497174]">
-//                 Already have an account?{" "}
-//                 <a
-//                   href="#"
-//                   className="text-[#EB6440] font-medium hover:underline"
-//                 >
-//                   Sign In
-//                 </a>
-//               </p>
-//             </form>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Register;
 import { useState } from "react";
-import Navbar from "../navbar/Navbar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -329,27 +7,23 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("user");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("Sending data:", { username, email, password, role });
-
-      const response = await axios.post(
-        "http://localhost:5000/api/users/register",
-        { username, email, password, role }
-      );
-
-      console.log("Response:", response.data);
-
+      const response = await axios.post("http://localhost:5000/users/register", {
+        username,
+        email,
+        password,
+        role,
+      });
       setMessage(response.data.message);
       if (response.data.message === "User registered successfully") {
         navigate("/login");
       }
     } catch (error) {
-      console.error("Registration error:", error);
       setMessage(
         error.response
           ? error.response.data.message
@@ -359,147 +33,107 @@ const Register = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-[#EFF5F5] p-4">
-        <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Image Section */}
-          <div className="w-full md:w-1/2 relative h-64 md:h-auto order-2 md:order-1">
-            <img
-              src="https://www.sqorebda3.com/vb/attachments/16229/" // استبدل الرابط بصورة صالحة
-              alt="Registration"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Form Section */}
-          <div className="w-full md:w-1/2 p-8 order-1 md:order-2">
-            <h2 className="text-3xl font-bold text-[#497174] mb-6">
-              Create an Account
-            </h2>
-
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
-                {message && (
-                  <div
-                    className={`mb-4 ${
-                      message.includes("successfully")
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {message}
-                  </div>
-                )}
-
-                <label
-                  htmlFor="name"
-                  className="block text-[#497174] font-medium"
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-                  placeholder="Enter your full name"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-[#497174] font-medium"
-                >
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="block text-[#497174] font-medium"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="role"
-                  className="block text-[#497174] font-medium"
-                >
-                  Role
-                </label>
-                <select
-                  id="role"
-                  className="w-full px-4 py-2 border rounded-md bg-[#EFF5F5] border-[#D6E4E5] focus:outline-none focus:ring-2 focus:ring-[#497174]"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  required
-                >
-                  <option value="">Select a role</option>
-                  <option value="user">User</option>
-                  <option value="publisher">Publisher</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  className="mr-2 h-4 w-4 accent-[#EB6440]"
-                  required
-                />
-                <label htmlFor="terms" className="text-[#497174]">
-                  I agree to the Terms and Conditions
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 px-4 bg-[#EB6440] text-white font-medium rounded-md hover:bg-opacity-90 transition duration-300 shadow-md"
-              >
-                Create Account
-              </button>
-
-              <p className="text-center text-[#497174]">
-                Already have an account?{" "}
-                <a
-                  href="#"
-                  className="text-[#EB6440] font-medium hover:underline"
-                >
-                  Sign In
-                </a>
-              </p>
-            </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4">
+      <div className="flex flex-col md:flex-row w-full max-w-5xl bg-[#1e1e2f] rounded-2xl shadow-2xl overflow-hidden relative border border-purple-700">
+        {/* Left Side */}
+        <div className="w-full md:w-1/2 p-8 bg-gradient-to-br from-purple-800 to-purple-600 flex flex-col justify-center text-white relative">
+          <h2 className="text-4xl font-extrabold mb-6 drop-shadow-[0_0_10px_#ffffff66]">Welcome, Gamer!</h2>
+          <p className="text-purple-100 text-lg mb-8">
+            Level up your experience. Create your player account now and join the game.
+          </p>
+          <div className="flex space-x-3">
+            <div className="h-2 w-16 bg-white rounded-full opacity-50"></div>
+            <div className="h-2 w-8 bg-white rounded-full opacity-30"></div>
+            <div className="h-2 w-4 bg-white rounded-full opacity-20"></div>
           </div>
         </div>
+
+        {/* Right Side - Form */}
+        <div className="w-full md:w-1/2 p-8 md:p-12 bg-[#1e1e2f] text-white">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-purple-400">Create Your Account</h2>
+            <p className="text-gray-400 mt-2">Start your journey</p>
+          </div>
+
+          {message && (
+            <div
+              className={`mb-6 p-3 rounded-lg text-sm ${
+                message.includes("successfully")
+                  ? "bg-green-600 text-white"
+                  : "bg-red-600 text-white"
+              }`}
+            >
+              {message}
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label className="block mb-1 text-purple-300">Full Name</label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 bg-[#2c2c3e] text-white border border-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Your full name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 text-purple-300">Email</label>
+              <input
+                type="email"
+                className="w-full px-4 py-3 bg-[#2c2c3e] text-white border border-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 text-purple-300">Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 bg-[#2c2c3e] text-white border border-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                className="mr-2 h-5 w-5 border-purple-500 focus:ring-purple-500 bg-[#2c2c3e]"
+                required
+              />
+              <label className="text-sm text-gray-400">
+                I agree to the{" "}
+                <span className="text-purple-300 underline">Terms</span> &{" "}
+                <span className="text-purple-300 underline">Privacy Policy</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-lg transition duration-300 shadow-[0_0_10px_#8B5DFF]"
+            >
+              Join Now
+            </button>
+
+            <p className="text-center text-sm text-gray-400 mt-4">
+              Already have an account?{" "}
+              <a href="/login" className="text-purple-300 hover:underline">
+                Sign in
+              </a>
+            </p>
+          </form>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
