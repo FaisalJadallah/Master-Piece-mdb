@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -172,9 +173,12 @@ const HomePage = () => {
           </div>
 
           {/* Explore Button with enhanced hover effect */}
-          <button className="mt-16 px-10 py-4 bg-[#8B5DFF] text-white rounded-full hover:bg-[#6A42C2] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg">
+          <Link 
+            to="/store"
+            className="mt-16 inline-block px-10 py-4 bg-[#8B5DFF] text-white rounded-full hover:bg-[#6A42C2] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+          >
             Explore All Products
-          </button>
+          </Link>
         </div>
       </section>
 
