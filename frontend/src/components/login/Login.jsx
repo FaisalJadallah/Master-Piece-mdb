@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../utils/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,18 +11,28 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/users/login", {
-        email,
-        password,
-      });
+      const response = await loginUser({ email, password });
 
+      // Store token and user data in localStorage
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.user.id);
+      localStorage.setItem("userRole", response.data.user.role);
+
+      console.log('Login successful, token stored:', response.data.token);
+      
       setMessage(response.data.message);
       if (response.data.message === "Logged in successfully") {
         setTimeout(() => {
-          navigate("/");
+          // Redirect based on user role
+          if (response.data.user.role === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
         }, 1000);
       }
     } catch (error) {
+      console.error('Login error:', error);
       setMessage(
         error.response
           ? error.response.data.message
@@ -107,7 +117,7 @@ const Login = () => {
             </button>
 
             <p className="text-center text-sm text-gray-400 mt-4">
-              Don’t have an account?{" "}
+              Don't have an account?{" "}
               <a href="/register" className="text-purple-300 hover:underline">
                 Create one
               </a>

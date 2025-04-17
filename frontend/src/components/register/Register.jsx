@@ -104,6 +104,22 @@ const Register = () => {
               />
             </div>
 
+            {/* User Role Selection (For Development Only) */}
+            <div>
+              <label className="block mb-1 text-purple-300">Account Type</label>
+              <select
+                className="w-full px-4 py-3 bg-[#2c2c3e] text-white border border-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                <option value="user">Regular User</option>
+                <option value="admin">Administrator</option>
+              </select>
+              <p className="text-xs mt-1 text-yellow-400">
+                Note: Administrator option for development purposes only.
+              </p>
+            </div>
+
             <div className="flex items-center">
               <input
                 type="checkbox"

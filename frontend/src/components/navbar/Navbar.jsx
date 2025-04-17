@@ -33,8 +33,8 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/Tournaments"
-              className={`hover:underline ${isActive("/Tournaments") ? "underline" : ""}`}
+              to="/tournaments"
+              className={`hover:underline ${isActive("/tournaments") ? "underline" : ""}`}
             >
               Tournaments
             </Link>

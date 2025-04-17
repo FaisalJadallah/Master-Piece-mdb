@@ -9,9 +9,10 @@ import Store from "./components/store/Store";
 import PlatformCards from "./components/store/PlatformCards";
 import CardDetails from "./components/store/CardDetails";
 import Tournaments from "./components/tournaments/Tournaments";
-import AdminProtectedPage from "./components/admin/AdminTournaments";
+import TournamentDetails from "./components/tournaments/TournamentDetails";
+import TournamentCheckout from "./components/tournaments/TournamentCheckout";
 import { CartProvider } from "./context/CartContext";
-import AdminDashboard from "./components/admin/AdminDashboard";
+import AdminRoutes from "./components/routes/AdminRoutes";
 
 const App = () => {
   return (
@@ -27,8 +28,9 @@ const App = () => {
           <Route path="/store/:platformId" element={<PlatformCards />} />
           <Route path="/store/:platformId/card/:cardId" element={<CardDetails />} />
           <Route path="/tournaments" element={<Tournaments />} />
-          <Route path="/admin/tournaments" element={<AdminProtectedPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/tournaments/:id" element={<TournamentDetails />} />
+          <Route path="/tournaments/:id/checkout" element={<TournamentCheckout />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
         </Routes>
       </Router>
     </CartProvider>
