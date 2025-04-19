@@ -1,36 +1,33 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import videoFile from "../../assets/Home/next-level.mp4"; 
 
 const HomePage = () => {
   return (
     <div className="bg-gray-900 text-white">
-      {/* Hero Section with Background Video */}
-      <section className="relative w-full h-screen overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute w-full h-full object-cover"
-        >
-          <source src="/assets/hero-video.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+     <section className="relative w-full h-screen overflow-hidden">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute w-full h-full object-cover z-0"
+      >
+        <source src={videoFile}type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
-        <div className="absolute inset-0 bg-[#563A9C] bg-opacity-70 z-10"></div>
 
-        <div className="relative z-20 flex items-center justify-center h-full text-center px-4">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold text-[#FFF7D1]">Welcome to GamingHive</h1>
-            <p className="mt-6 text-xl text-[#FFF7D1]">
-              Dive into the ultimate gaming experience.
-            </p>
-            <button className="mt-8 px-8 py-4 bg-[#8B5DFF] text-white rounded-full hover:bg-[#6A42C2] transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg">
-              Explore Now
-            </button>
-          </div>
+
+      <div className="relative z-20 flex items-center justify-center h-full text-center px-4">
+        <div className="max-w-2xl">
+          <h1 className="text-5xl font-bold text-[#FFFFFF]">Welcome to GamingHive</h1>
+          <p className="mt-6 text-xl text-[#FFF">
+            Dive into the ultimate gaming experience.
+          </p>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Store Section */}
       <section className="py-24 bg-gradient-to-b from-[#563A9C] to-[#6A42C2]">

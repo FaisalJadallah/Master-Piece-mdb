@@ -21,7 +21,7 @@ const Register = () => {
       });
       setMessage(response.data.message);
       if (response.data.message === "User registered successfully") {
-        navigate("/login");
+        navigate("/"); // ✅ توجيه المستخدم إلى الصفحة الرئيسية بعد التسجيل
       }
     } catch (error) {
       setMessage(
@@ -35,6 +35,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4">
       <div className="flex flex-col md:flex-row w-full max-w-5xl bg-[#1e1e2f] rounded-2xl shadow-2xl overflow-hidden relative border border-purple-700">
+        
         {/* Left Side */}
         <div className="w-full md:w-1/2 p-8 bg-gradient-to-br from-purple-800 to-purple-600 flex flex-col justify-center text-white relative">
           <h2 className="text-4xl font-extrabold mb-6 drop-shadow-[0_0_10px_#ffffff66]">Welcome, Gamer!</h2>
@@ -104,7 +105,6 @@ const Register = () => {
               />
             </div>
 
-            {/* User Role Selection (For Development Only) */}
             <div>
               <label className="block mb-1 text-purple-300">Account Type</label>
               <select
