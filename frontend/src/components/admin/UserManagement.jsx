@@ -122,24 +122,6 @@ const UserManagement = () => {
             {error}
           </div>
         )}
-        
-        {/* Debug Information */}
-        {debugInfo && (
-          <div className="bg-gray-800 p-4 rounded-lg mb-4">
-            <div className="flex justify-between">
-              <h3 className="text-xl font-semibold mb-2">Debug Information</h3>
-              <button 
-                onClick={() => setDebugInfo(null)}
-                className="text-gray-400 hover:text-white"
-              >
-                Hide
-              </button>
-            </div>
-            <pre className="text-xs bg-gray-900 p-3 rounded overflow-auto">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          </div>
-        )}
 
         {users.length === 0 ? (
           <div className="bg-gray-800 rounded-lg p-8 text-center">

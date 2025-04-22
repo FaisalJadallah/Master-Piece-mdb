@@ -174,3 +174,55 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Update user profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    console.log(`[UPDATE_PROFILE] User ${userId} attempting to update profile`);
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      console.log(`[UPDATE_PROFILE] User not found: ${userId}`);
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    // Handle username update
+    if (req.body.username) {
+      user.username = req.body.username;
+    }
+    
+    // Handle password update if provided
+    if (req.body.currentPassword && req.body.newPassword) {
+      // Verify current password
+      const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
+      if (!isMatch) {
+        console.log(`[UPDATE_PROFILE] Invalid current password for user: ${userId}`);
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+      
+      // Update password
+      user.password = req.body.newPassword;
+    }
+    
+    // Handle profile picture if uploaded
+    if (req.file) {
+      user.profilePicture = `/uploads/${req.file.filename}`;
+      console.log(`[UPDATE_PROFILE] Profile picture updated: ${user.profilePicture}`);
+    }
+    
+    await user.save();
+    
+    // Send updated user without password
+    const updatedUser = await User.findById(userId).select("-password");
+    
+    console.log(`[UPDATE_PROFILE] Profile updated successfully for: ${user.username}`);
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('[UPDATE_PROFILE] Error updating profile:', err);
+    res.status(500).json({ message: err.message });
+  }
+};

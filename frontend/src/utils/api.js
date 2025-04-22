@@ -184,4 +184,12 @@ export const deleteProduct = (id) => {
     });
 };
 
+export const updateUserProfile = (formData) => {
+  return api.put('/users/profile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
+
 export default api; 

@@ -1,33 +1,56 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import videoFile from "../../assets/Home/next-level.mp4"; 
+import VoltageButton from "../common/VoltageButton";
 
 const HomePage = () => {
   return (
     <div className="bg-gray-900 text-white">
-     <section className="relative w-full h-screen overflow-hidden">
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute w-full h-full object-cover z-0"
-      >
-        <source src={videoFile}type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-
-
-
-      <div className="relative z-20 flex items-center justify-center h-full text-center px-4">
-        <div className="max-w-2xl">
-          <h1 className="text-5xl font-bold text-[#FFFFFF]">Welcome to GamingHive</h1>
-          <p className="mt-6 text-xl text-[#FFF">
-            Dive into the ultimate gaming experience.
-          </p>
-        </div>
+      {/* Fixed position live stream in bottom left */}
+      <div className="fixed bottom-4 left-4 z-50 w-64 h-40 md:w-[350px] md:h-[180px] lg:w-[360px] lg:h-[250px] shadow-2xl rounded-lg overflow-hidden">
+        <iframe 
+          src="https://kick.com/baianotv" 
+          frameBorder="0" 
+          allowFullScreen={true}
+          allow="autoplay"
+          muted
+          className="w-full h-full"
+          style={{ 
+            position: 'absolute', 
+            top: '-6px', 
+            left: '-100px', 
+            width: 'calc(100% + 200px)', 
+            height: 'calc(100% + 150px)',
+            transform: 'scale(1.05)'
+          }}
+          title="Kick Live Stream"
+        ></iframe>
       </div>
-    </section>
+      
+      <section className="relative w-full h-screen overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute w-full h-full object-cover z-0"
+        >
+          <source src={videoFile} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* Overlay for opacity */}
+        <div className="absolute inset-0 bg-black opacity-65 z-10"></div>
+
+        <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4">
+          <div className="max-w-2xl">
+            <h1 className="text-5xl font-bold text-[#FFFFFF]">Welcome to GamingHive</h1>
+            <p className="mt-6 text-xl text-[#FFF]">
+              Dive into the ultimate gaming experience.
+            </p>
+          </div>
+          
+        </div>
+      </section>
 
       {/* Store Section */}
       <section className="py-24 bg-gradient-to-b from-[#563A9C] to-[#6A42C2]">
@@ -41,17 +64,17 @@ const HomePage = () => {
             {[
               {
                 title: "playStation",
-                desc: "High-quality gaming t-shirt for the ultimate fan!",
+                desc: "d money to your PlayStation account. You can use it to buy games, add-ons, movies, and more from the PlayStation Store. It's a quick and easy gift for any gamer!",
                 img: "/src/assets/Home/playstation-store-logo-1200x900.jpg",
               },
               {
                 title: "Xbox",
-                desc: "Top-notch audio quality for immersive gaming.",
+                desc: "gives you credit to spend on your Xbox account. You can use it to get games, DLCs, movies, apps, and more from the Xbox Store. It's a fun and simple gift for any Xbox fan!",
                 img: "/src/assets/Home/xbox.jpg",
               },
               {
                 title: "Steam",
-                desc: "Precision gaming mouse for the ultimate performance.",
+                desc: "Steam Gift Cards let you top up your Steam account and buy games, add-ons, and more. Great for gamers who love PC gaming!",
                 img: "/src/assets/Home/steam_logo_art_2000.webp",
               },
             ].map((item, index) => (
@@ -79,12 +102,12 @@ const HomePage = () => {
             ))}
           </div>
 
-          <Link
-            to="/store"
-            className="mt-16 inline-block px-10 py-4 bg-[#8B5DFF] text-white rounded-full hover:bg-[#6A42C2] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
-          >
-            Explore All Products
-          </Link>
+          {/* Centered Explore Button */}
+          <div className="flex justify-center mt-16">
+            <VoltageButton to="/store">
+              Explore All Products
+            </VoltageButton>
+          </div>
         </div>
       </section>
 
@@ -154,9 +177,13 @@ const HomePage = () => {
           <p className="mt-6 text-xl text-[#FFF7D1] max-w-2xl mx-auto">
             Get ready for exciting tournaments with amazing prizes!
           </p>
-          <button className="mt-12 px-10 py-5 bg-[#8B5DFF] text-[#FFF7D1] font-medium rounded-full hover:bg-opacity-80 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
-            View Upcoming Tournaments
-          </button>
+          
+          {/* Centered Tournaments Button */}
+          <div className="flex justify-center mt-16">
+            <VoltageButton to="/tournaments">
+              Explore All Tournaments
+            </VoltageButton>
+          </div>
         </div>
       </section>
     </div>

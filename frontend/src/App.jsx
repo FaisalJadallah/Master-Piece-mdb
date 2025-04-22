@@ -14,15 +14,18 @@ import TournamentDetails from "./components/tournaments/TournamentDetails";
 import TournamentCheckout from "./components/tournaments/TournamentCheckout";
 import { CartProvider } from "./context/CartContext";
 import AdminRoutes from "./components/routes/AdminRoutes";
+import AboutUs from "./components/aboutus/AboutUs";
+
 
 // ⬇️ Nested app to access location
 const AppContent = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAuthRoute = location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <>
-      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && !isAuthRoute && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -36,9 +39,11 @@ const AppContent = () => {
         <Route path="/tournaments/:id" element={<TournamentDetails />} />
         <Route path="/tournaments/:id/checkout" element={<TournamentCheckout />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/aboutus" element={<AboutUs />} />
+
       </Routes>
 
-      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && !isAuthRoute && <Footer />}
     </>
   );
 };

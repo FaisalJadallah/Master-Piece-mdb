@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: "user" },
-});
+  profilePicture: { type: String, default: "/uploads/default-avatar.png" },
+}, { timestamps: true });
 
 // تشفير كلمة السر قبل الحفظ
 userSchema.pre("save", async function (next) {
@@ -15,5 +16,10 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+// Method to compare passwords for login
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 module.exports = mongoose.model("User", userSchema);

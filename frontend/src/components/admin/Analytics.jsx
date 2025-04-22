@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FaChartBar, FaUsers, FaTrophy, FaShoppingCart } from 'react-icons/fa';
+import { FaChartBar, FaUsers, FaTrophy, FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 import { verifyAdmin, getAllUsers, getAllTournaments, getAllProducts } from '../../utils/api';
 
 const Analytics = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -149,7 +151,19 @@ const Analytics = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-[#FFF7D1] mb-8">Analytics Dashboard</h1>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center">
+            <button 
+              onClick={() => navigate('/admin')}
+              className="flex items-center mr-4 bg-purple-800 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+              aria-label="Back to Admin Dashboard"
+            >
+              <FaArrowLeft className="mr-2" />
+              Back to Dashboard
+            </button>
+            <h1 className="text-4xl font-bold text-[#FFF7D1]">Analytics Dashboard</h1>
+          </div>
+        </div>
         
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -189,24 +203,6 @@ const Analytics = () => {
             <p className="text-gray-400 mt-2">Monthly revenue</p>
           </div>
         </div>
-        
-        {/* Debug Info in Production */}
-        {debugInfo && (
-          <div className="bg-gray-800 p-4 rounded-lg mb-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold">Debug Info</h3>
-              <button 
-                onClick={() => setDebugInfo(null)} 
-                className="text-sm bg-gray-700 px-2 py-1 rounded hover:bg-gray-600"
-              >
-                Hide
-              </button>
-            </div>
-            <pre className="text-xs bg-gray-900 p-3 rounded overflow-auto mt-2">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          </div>
-        )}
         
         {/* Additional Analytics Charts would go here */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../utils/api";
+import { Home } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -42,7 +43,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4 relative">
+      {/* Home Button */}
+      <button 
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 flex items-center justify-center bg-purple-700 hover:bg-purple-600 text-white rounded-full p-3 transition-all duration-300 shadow-lg z-10"
+        aria-label="Return to home"
+      >
+        <Home size={24} />
+      </button>
+      
       <div className="flex flex-col md:flex-row w-full max-w-5xl bg-[#1e1e2f] rounded-2xl shadow-2xl overflow-hidden relative border border-purple-700">
         {/* Left Side */}
         <div className="w-full md:w-1/2 p-8 bg-gradient-to-br from-purple-800 to-purple-600 flex flex-col justify-center text-white relative">
