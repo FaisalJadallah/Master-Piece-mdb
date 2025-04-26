@@ -26,7 +26,13 @@ const Tournaments = () => {
   }, []);
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -50,43 +56,61 @@ const Tournaments = () => {
         ) : (
           <div className="space-y-6">
             {tournaments.map((tournament) => (
-              <Link 
-                to={`/tournaments/${tournament._id}`} 
+              <div
                 key={tournament._id}
-                className="block hover:transform hover:scale-[1.01] transition-all duration-200"
+                className="bg-[#6A42C2] p-5 rounded-xl shadow-md flex flex-col md:flex-row gap-4 items-center hover:transform hover:scale-[1.01] transition-all duration-200"
               >
-                <div className="bg-[#6A42C2] p-5 rounded-xl shadow-md flex gap-4 items-center">
-                  {tournament.imageUrl && (
-                    <img
-                      src={tournament.imageUrl}
-                      alt={tournament.gameName}
-                      className="w-20 h-20 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/80?text=Game';
-                      }}
-                    />
-                  )}
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-semibold text-[#FFF7D1]">
+                {tournament.imageUrl && (
+                  <img
+                    src={tournament.imageUrl}
+                    alt={tournament.gameName}
+                    className="w-20 h-20 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/80?text=Game";
+                    }}
+                  />
+                )}
+                <div className="flex-1">
+                  <Link to={`/tournaments/${tournament._id}`}>
+                    <h3 className="text-2xl font-semibold text-[#FFF7D1] hover:underline">
                       {tournament.gameName}
                     </h3>
-                    <p className="text-sm mt-1">📅 {formatDate(tournament.dateTime)}</p>
-                    <p className="text-sm">👥 Players: {tournament.numberOfPlayers}</p>
-                    <p className="text-sm">🏆 Prize: {tournament.prize}</p>
-                    <p className="text-sm">💰 Fee: ${tournament.registrationFee || 10}</p>
-                  </div>
-                  <div>
-                    <span className={`px-3 py-1 rounded-full text-xs ${
-                      tournament.status === 'upcoming' ? 'bg-blue-900 text-blue-200' :
-                      tournament.status === 'ongoing' ? 'bg-green-900 text-green-200' :
-                      'bg-gray-700 text-gray-300'
-                    }`}>
-                      {tournament.status.charAt(0).toUpperCase() + tournament.status.slice(1)}
-                    </span>
-                  </div>
+                  </Link>
+                  <p className="text-sm mt-1">
+                    📅 {formatDate(tournament.dateTime)}
+                  </p>
+                  <p className="text-sm">👥 Players: {tournament.numberOfPlayers}</p>
+                  <p className="text-sm">🏆 Prize: {tournament.prize}</p>
+                  <p className="text-sm">💰 Fee: ${tournament.registrationFee || 10}</p>
+
+                  {tournament.status === "upcoming" && (
+                    <div className="mt-3">
+                      <Link
+                        to={`/tournaments/${tournament._id}/checkout`}
+                        className="inline-block bg-yellow-500 text-black px-4 py-2 rounded font-semibold hover:bg-yellow-600 transition"
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  )}
                 </div>
-              </Link>
+
+                <div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs ${
+                      tournament.status === "upcoming"
+                        ? "bg-blue-900 text-blue-200"
+                        : tournament.status === "ongoing"
+                        ? "bg-green-900 text-green-200"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {tournament.status.charAt(0).toUpperCase() +
+                      tournament.status.slice(1)}
+                  </span>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -96,4 +120,3 @@ const Tournaments = () => {
 };
 
 export default Tournaments;
-

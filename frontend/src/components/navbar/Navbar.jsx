@@ -94,6 +94,7 @@ const Navbar = () => {
             <li><NavLink to="/">Home</NavLink></li>
             <li><NavLink to="/tournaments">Tournaments</NavLink></li>
             <li><NavLink to="/store">Store</NavLink></li>
+            <li><NavLink to="/news">News</NavLink></li>
             <li><NavLink to="/aboutus">About Us</NavLink></li>
           </ul>
 
@@ -173,6 +174,7 @@ const Navbar = () => {
             <li><NavLink to="/aboutus">About Us</NavLink></li>
             <li><NavLink to="/tournaments">Tournaments</NavLink></li>
             <li><NavLink to="/store">Store</NavLink></li>
+            <li><NavLink to="/news">News</NavLink></li>
             {!isLoggedIn && (
               <>
                 <li><NavLink to="/login">Login</NavLink></li>

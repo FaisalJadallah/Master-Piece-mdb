@@ -12,9 +12,13 @@ import CardDetails from "./components/store/CardDetails";
 import Tournaments from "./components/tournaments/Tournaments";
 import TournamentDetails from "./components/tournaments/TournamentDetails";
 import TournamentCheckout from "./components/tournaments/TournamentCheckout";
+import NewsPage from "./components/news/NewsPage";
+import NewsDetail from "./components/news/NewsDetail";
 import { CartProvider } from "./context/CartContext";
 import AdminRoutes from "./components/routes/AdminRoutes";
 import AboutUs from "./components/aboutus/AboutUs";
+import AccessoriesProducts from "./components/store/AccessoriesProducts";
+import ProductDetails from "./components/store/ProductDetails";
 
 
 // ⬇️ Nested app to access location
@@ -35,12 +39,15 @@ const AppContent = () => {
         <Route path="/store" element={<Store />} />
         <Route path="/store/:platformId" element={<PlatformCards />} />
         <Route path="/store/:platformId/card/:cardId" element={<CardDetails />} />
+        <Route path="/store/accessories/:categoryId" element={<AccessoriesProducts />} />
+        <Route path="/store/accessories/:categoryId/product/:productId" element={<ProductDetails />} />
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/tournaments/:id" element={<TournamentDetails />} />
         <Route path="/tournaments/:id/checkout" element={<TournamentCheckout />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/aboutus" element={<AboutUs />} />
-
+        <Route path="/news" element={<NewsPage />} />
+        <Route path="/news/:id" element={<NewsDetail />} />
       </Routes>
 
       {!isAdminRoute && !isAuthRoute && <Footer />}

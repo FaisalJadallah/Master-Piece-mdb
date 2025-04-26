@@ -1,7 +1,7 @@
 // src/pages/AdminDashboard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaTrophy, FaUsers, FaStore, FaChartBar } from "react-icons/fa";
+import { FaTrophy, FaUsers, FaStore, FaChartBar, FaNewspaper } from "react-icons/fa";
 
 const AdminDashboard = () => {
   return (
@@ -47,6 +47,20 @@ const AdminDashboard = () => {
               </div>
               <p className="text-gray-400 mb-4">Manage digital products</p>
               <div className="bg-green-600 py-2 px-4 rounded-md text-center text-white">
+                Manage
+              </div>
+            </div>
+          </Link>
+          
+          {/* News Card */}
+          <Link to="/admin/news" className="block">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-750 transition-colors duration-200">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">News</h2>
+                <FaNewspaper className="text-purple-500 text-2xl" />
+              </div>
+              <p className="text-gray-400 mb-4">Manage news articles</p>
+              <div className="bg-purple-600 py-2 px-4 rounded-md text-center text-white">
                 Manage
               </div>
             </div>

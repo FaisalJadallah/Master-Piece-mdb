@@ -5,6 +5,7 @@ import TournamentManagement from '../admin/TournamentManagement';
 import TournamentParticipants from '../admin/TournamentParticipants';
 import UserManagement from '../admin/UserManagement';
 import StoreManagement from '../admin/StoreManagement';
+import NewsManagement from '../admin/NewsManagement';
 import FileUploader from '../admin/FileUploader';
 import Analytics from '../admin/Analytics';
 import { verifyAdmin } from '../../utils/api';
@@ -111,6 +112,14 @@ const AdminRoutes = () => {
         element={
           <ProtectedRoute>
             <Analytics />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/news"
+        element={
+          <ProtectedRoute>
+            <NewsManagement />
           </ProtectedRoute>
         }
       />

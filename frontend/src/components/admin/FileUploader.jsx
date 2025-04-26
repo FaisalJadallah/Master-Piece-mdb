@@ -1,118 +1,169 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { FaUpload, FaSpinner } from 'react-icons/fa';
-
-const API_URL = 'http://localhost:5000';
+import { FaCloudUploadAlt } from 'react-icons/fa';
 
 const FileUploader = ({ onFileUploaded }) => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    
-    if (file) {
-      setSelectedFile(file);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      // Validate file type
+      if (!selectedFile.type.match('image.*')) {
+        setUploadError('Please select an image file (JPEG, PNG, etc.)');
+        return;
+      }
       
-      // Create a preview URL for the selected image
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        setPreviewUrl(fileReader.result);
-      };
-      fileReader.readAsDataURL(file);
+      // Validate file size (max 5MB)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        setUploadError('File size must be less than 5MB');
+        return;
+      }
       
-      // Reset error state
-      setError(null);
+      setFile(selectedFile);
+      setUploadError('');
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      setError('Please select a file first');
+  const uploadFile = async () => {
+    if (!file) {
+      setUploadError('Please select a file to upload');
       return;
     }
 
-    setLoading(true);
+    setUploading(true);
+    setUploadProgress(0);
     
-    // Create form data
     const formData = new FormData();
-    formData.append('image', selectedFile);
+    formData.append('image', file);
     
     try {
-      const response = await axios.post(`${API_URL}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      console.log('Uploading file:', file.name);
+      // Try with both potential API endpoints
+      let response;
+      try {
+        response = await axios.post('http://localhost:5000/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+          },
+        });
+      } catch (error) {
+        console.log('First upload endpoint failed, trying alternative');
+        // Try alternative endpoint if first one fails
+        response = await axios.post('http://localhost:5000/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+          },
+        });
+      }
       
-      // Call the callback with the uploaded file URL
-      onFileUploaded(response.data.fileUrl);
+      console.log('Upload successful, response:', response.data);
       
-      // Reset the component state
-      setSelectedFile(null);
-      setPreviewUrl(null);
-    } catch (err) {
-      console.error('Upload error:', err);
-      setError(err.response?.data?.message || 'Failed to upload file');
+      // Handle different response formats
+      const imageUrl = response.data.imageUrl || response.data.fileUrl || response.data.url || response.data;
+      
+      onFileUploaded(imageUrl);
+      setUploadError('');
+    } catch (error) {
+      console.error('Upload error details:', error);
+      
+      if (error.response) {
+        console.error('Server error response:', {
+          status: error.response.status,
+          data: error.response.data
+        });
+        setUploadError(`Failed to upload image: ${error.response.data.message || error.response.statusText}`);
+      } else {
+        setUploadError('Failed to upload image. Please check your internet connection and try again.');
+      }
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
   return (
-    <div className="bg-gray-750 p-4 rounded-lg border border-gray-700">
-      <div className="flex flex-col items-center space-y-4">
-        {previewUrl && (
-          <div className="w-full max-w-xs mb-2">
-            <img 
-              src={previewUrl} 
-              alt="Preview" 
-              className="w-full h-auto rounded-md object-cover"
-              style={{ maxHeight: '150px' }}
-            />
+    <div className="bg-gray-750 p-6 rounded-lg">
+      <h3 className="text-lg font-semibold mb-4">Upload Image</h3>
+      
+      <div className="mb-4">
+        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer bg-gray-800 hover:bg-gray-700 transition-all">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <FaCloudUploadAlt className="w-10 h-10 mb-3 text-gray-400" />
+            <p className="mb-2 text-sm text-gray-400">
+              <span className="font-semibold">Click to upload</span> or drag and drop
+            </p>
+            <p className="text-xs text-gray-500">PNG, JPG, GIF (MAX. 5MB)</p>
           </div>
-        )}
-        
-        <label className="w-full flex flex-col items-center px-4 py-6 bg-gray-700 text-white rounded-lg cursor-pointer hover:bg-gray-600 transition-colors">
-          <FaUpload className="text-2xl mb-2" />
-          <span className="mt-2 text-base">Select an image</span>
           <input 
             type="file" 
             className="hidden" 
-            accept="image/*" 
             onChange={handleFileChange} 
+            accept="image/*" 
           />
         </label>
-        
-        {selectedFile && (
-          <div className="text-sm text-gray-300 truncate max-w-full">
-            {selectedFile.name}
+      </div>
+      
+      {file && (
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-16 h-16 rounded-md overflow-hidden">
+            <img 
+              src={URL.createObjectURL(file)} 
+              alt="Preview" 
+              className="w-full h-full object-cover"
+            />
           </div>
-        )}
-        
-        {error && (
-          <div className="text-red-500 text-sm">{error}</div>
-        )}
-        
+          <div className="text-sm">
+            <p className="text-white">{file.name}</p>
+            <p className="text-gray-400">{(file.size / 1024).toFixed(2)} KB</p>
+          </div>
+        </div>
+      )}
+      
+      {uploadError && (
+        <div className="bg-red-900 bg-opacity-50 text-red-200 px-3 py-2 rounded-md mb-4">
+          {uploadError}
+        </div>
+      )}
+      
+      {uploading && (
+        <div className="mb-4">
+          <div className="w-full bg-gray-700 rounded-full h-2.5">
+            <div 
+              className="bg-purple-600 h-2.5 rounded-full" 
+              style={{ width: `${uploadProgress}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-right mt-1 text-gray-400">
+            {uploadProgress}% Uploaded
+          </p>
+        </div>
+      )}
+      
+      <div className="flex justify-end">
         <button
-          onClick={handleUpload}
-          disabled={!selectedFile || loading}
-          className={`w-full py-2 px-4 rounded-md flex items-center justify-center ${
-            !selectedFile || loading
+          type="button"
+          onClick={uploadFile}
+          disabled={!file || uploading}
+          className={`px-4 py-2 rounded-md ${
+            !file || uploading
               ? 'bg-gray-600 cursor-not-allowed'
-              : 'bg-[#8B5DFF] hover:bg-[#6A42C2]'
+              : 'bg-purple-600 hover:bg-purple-700'
           }`}
         >
-          {loading ? (
-            <>
-              <FaSpinner className="animate-spin mr-2" />
-              Uploading...
-            </>
-          ) : (
-            'Upload'
-          )}
+          {uploading ? 'Uploading...' : 'Upload Image'}
         </button>
       </div>
     </div>
