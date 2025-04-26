@@ -78,16 +78,75 @@ const Navbar = () => {
 
           {/* Logo */}
           <button
-            onClick={() => navigate("/")}
-            className="flex items-center space-x-2 group"
-          >
-            <div className="bg-amber-100 text-purple-900 p-2 rounded-full transform transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
-              <Gamepad2 size={24} className="text-purple-800" />
-            </div>
-            <span className="text-2xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-amber-100 to-amber-200">
-              GamingHive
-            </span>
-          </button>
+      onClick={() => navigate("/")}
+      className="flex items-center space-x-3 group"
+    >
+      {/* Logo/Icon Part */}
+      <div className="relative w-14 h-14 flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+        {/* Hexagonal Background */}
+        <svg viewBox="0 0 100 100" className="absolute w-full h-full transition-transform duration-500 group-hover:rotate-12">
+          <defs>
+            <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#4A1D96" />
+              <stop offset="100%" stopColor="#18013E" />
+            </linearGradient>
+            <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FEFCE8" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#FDE68A" stopOpacity="0.7" />
+            </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+          
+          {/* Glow effect on hover */}
+          <polygon 
+            points="50,10 90,30 90,70 50,90 10,70 10,30" 
+            fill="none" 
+            stroke="url(#glowGradient)" 
+            strokeWidth="4"
+            opacity="0"
+            className="transition-opacity duration-300 group-hover:opacity-100"
+            filter="url(#glow)"
+          />
+          
+          {/* Main Hexagon */}
+          <polygon 
+            points="50,10 90,30 90,70 50,90 10,70 10,30" 
+            fill="url(#hexGradient)" 
+            stroke="#8B5CF6" 
+            strokeWidth="2"
+            className="transition-all duration-300 group-hover:stroke-amber-200"
+          />
+          
+          {/* Honeycomb Pattern */}
+          <g opacity="0.15" className="transition-opacity duration-300 group-hover:opacity-25">
+            <path d="M30,30 L40,35 L40,45 L30,50 L20,45 L20,35 Z" fill="#FEFCE8" />
+            <path d="M50,30 L60,35 L60,45 L50,50 L40,45 L40,35 Z" fill="#FEFCE8" />
+            <path d="M70,30 L80,35 L80,45 L70,50 L60,45 L60,35 Z" fill="#FEFCE8" />
+            <path d="M40,50 L50,55 L50,65 L40,70 L30,65 L30,55 Z" fill="#FEFCE8" />
+            <path d="M60,50 L70,55 L70,65 L60,70 L50,65 L50,55 Z" fill="#FEFCE8" />
+          </g>
+        </svg>
+        
+        {/* Gamepad Icon */}
+        <svg 
+          viewBox="0 0 24 24" 
+          width="24" 
+          height="24" 
+          className="relative z-10 text-amber-100 transition-transform duration-300 group-hover:scale-110 group-hover:text-amber-200"
+          fill="currentColor"
+        >
+          <path d="M6 9h2v2h2v2H8v2H6v-2H4v-2h2V9zm11-3a7 7 0 0 1 0 14c-1.75 0-3.27-.73-4.83-1.65-.16-.1-.74-.5-.97-.62-.25-.13-.53-.2-.7-.2s-.45.07-.7.2c-.23.12-.81.51-.97.62C7.27 19.27 5.75 20 4 20a7 7 0 0 1 0-14c1.75 0 3.27.73 4.83 1.65.16.1.74.5.97.62.25.13.53.2.7.2s.45-.07.7-.2c.23-.12.81-.51.97-.62C13.73 6.73 15.25 6 17 6zm0 2c-1.18 0-2.32.54-3.6 1.3-.24.15-.86.55-1.23.75-.59.32-1.06.45-1.67.45-.61 0-1.08-.13-1.67-.45-.37-.2-.99-.6-1.23-.75C6.32 8.54 5.18 8 4 8a5 5 0 0 0 0 10c1.18 0 2.32-.54 3.6-1.3.24-.15.86-.55 1.23-.75.59-.32 1.06-.45 1.67-.45.61 0 1.08.13 1.67.45.37.2.99.6 1.23.75 1.28.76 2.42 1.3 3.6 1.3a5 5 0 0 0 0-10z" />
+        </svg>
+      </div>
+      
+      {/* Text Part */}
+      <span className="text-2xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-amber-100 to-amber-200 transition-all duration-300 group-hover:from-amber-200 group-hover:to-amber-300">
+        GamingHive
+      </span>
+    </button>
 
           {/* Navigation Links - Center */}
           <ul className="hidden md:flex gap-6 font-medium items-center absolute left-1/2 transform -translate-x-1/2">
