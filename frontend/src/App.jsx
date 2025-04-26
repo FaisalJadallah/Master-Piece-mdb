@@ -38,7 +38,7 @@ const AppContent = () => {
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/tournaments/:id" element={<TournamentDetails />} />
         <Route path="/tournaments/:id/checkout" element={<TournamentCheckout />} />
-        <Route path="/admin/*" element={<AdminRoutes />} />
+*        <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/aboutus" element={<AboutUs />} />
 
       </Routes>
