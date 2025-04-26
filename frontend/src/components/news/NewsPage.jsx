@@ -47,7 +47,7 @@ const NewsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1e1e2f] to-[#2c2c3e] py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-[#FFF7D1]">Latest Gaming News</h1>

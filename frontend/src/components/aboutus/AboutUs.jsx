@@ -2,12 +2,12 @@ import React from "react";
 
 const AboutUs = () => {
   return (
-    <section className="bg-gray-950 text-white py-20 px-6">
+    <section className="bg-gray-900 text-white py-20 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-[#FFF7D1] mb-4">About GamingHive</h1>
           <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            GamingHive is more than just a platform – it’s a digital ecosystem designed to bring gamers together. We provide everything from secure digital shopping, competitive tournaments, to the latest news and trends in the gaming world.
+            GamingHive is more than just a platform – it's a digital ecosystem designed to bring gamers together. We provide everything from secure digital shopping, competitive tournaments, to the latest news and trends in the gaming world.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ const AboutUs = () => {
         <div className="text-center">
           <h3 className="text-2xl font-semibold mb-2">🚀 Our Mission</h3>
           <p className="text-gray-400 max-w-3xl mx-auto">
-            At GamingHive, we aim to build a united space for all gamers – from casual players to esports champions. We’re driven by passion and powered by innovation, constantly evolving to match the needs of the global gaming community.
+            At GamingHive, we aim to build a united space for all gamers – from casual players to esports champions. We're driven by passion and powered by innovation, constantly evolving to match the needs of the global gaming community.
           </p>
         </div>
       </div>

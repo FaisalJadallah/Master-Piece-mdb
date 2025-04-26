@@ -43,7 +43,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] p-4 relative">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4 relative">
       {/* Home Button */}
       <button 
         onClick={() => navigate('/')}

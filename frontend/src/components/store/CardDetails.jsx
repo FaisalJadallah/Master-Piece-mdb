@@ -29,7 +29,7 @@ const CardDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] py-12 px-4">
+    <div className="min-h-screen bg-gray-900 py-12 px-4">
       <div className="max-w-6xl mx-auto text-[#FFF7D1]">
         <div className="mb-6">
           <Link
