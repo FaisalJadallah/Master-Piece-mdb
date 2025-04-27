@@ -42,41 +42,33 @@ const FileUploader = ({ onFileUploaded }) => {
     
     try {
       console.log('Uploading file:', file.name);
-      // Try with both potential API endpoints
-      let response;
-      try {
-        response = await axios.post('http://localhost:5000/api/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percentCompleted);
-          },
-        });
-      } catch (error) {
-        console.log('First upload endpoint failed, trying alternative');
-        // Try alternative endpoint if first one fails
-        response = await axios.post('http://localhost:5000/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percentCompleted);
-          },
-        });
-      }
+      // Use the correct upload endpoint with query parameter
+      const response = await axios.post('http://localhost:5000/upload?type=product', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        },
+      });
       
       console.log('Upload successful, response:', response.data);
       
-      // Handle different response formats
-      const imageUrl = response.data.imageUrl || response.data.fileUrl || response.data.url || response.data;
-      
-      onFileUploaded(imageUrl);
-      setUploadError('');
+      // Handle the response from the server
+      if (response.data && (response.data.fileUrl || response.data.fullUrl)) {
+        // Prefer the full URL if available, otherwise construct it
+        const imageUrl = response.data.fullUrl || 
+                         `http://localhost:5000${response.data.fileUrl}`;
+        
+        console.log('Image URL to use:', imageUrl);
+        onFileUploaded(imageUrl);
+        setUploadError('');
+      } else {
+        console.error('Unexpected response format:', response.data);
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       console.error('Upload error details:', error);
       
@@ -85,9 +77,9 @@ const FileUploader = ({ onFileUploaded }) => {
           status: error.response.status,
           data: error.response.data
         });
-        setUploadError(`Failed to upload image: ${error.response.data.message || error.response.statusText}`);
+        setUploadError(`Failed to upload image: ${error.response.data?.message || error.response.statusText}`);
       } else {
-        setUploadError('Failed to upload image. Please check your internet connection and try again.');
+        setUploadError(`Failed to upload image: ${error.message || 'Unknown error'}`);
       }
     } finally {
       setUploading(false);

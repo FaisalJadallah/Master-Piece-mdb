@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { FaArrowLeft, FaShoppingCart } from 'react-icons/fa';
+import { FaArrowLeft, FaShoppingCart, FaCheck } from 'react-icons/fa';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { useCart } from '../../context/CartContext';
 
 const AccessoriesProducts = () => {
   const { categoryId } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { addToCart } = useCart();
+  const [addedToCartMap, setAddedToCartMap] = useState({});
   const categoryNames = {
     'headphones': 'Gaming Headsets',
     'keyboards': 'Gaming Keyboards',
@@ -22,11 +25,11 @@ const AccessoriesProducts = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Fetch products from backend filtered by accessory category
-        const response = await axios.get(`http://localhost:5000/api/store`, {
+        // Fix the API endpoint URL (remove /api prefix) and use correct query parameters
+        const response = await axios.get(`http://localhost:5000/store`, {
           params: { 
-            type: 'accessory',
-            category: categoryId 
+            category: 'accessories',
+            subcategory: categoryId  // Add subcategory to filter by specific accessory type
           }
         });
         
@@ -46,6 +49,29 @@ const AccessoriesProducts = () => {
 
     fetchProducts();
   }, [categoryId]);
+
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: product._id,
+      title: product.title,
+      price: product.price,
+      image: product.imageUrl
+    });
+    
+    // Set the added state for this specific product
+    setAddedToCartMap(prev => ({
+      ...prev,
+      [product._id]: true
+    }));
+    
+    // Reset the added state after 2 seconds
+    setTimeout(() => {
+      setAddedToCartMap(prev => ({
+        ...prev,
+        [product._id]: false
+      }));
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1e1e2f] to-[#2c2c3e] py-12 px-4 sm:px-6 lg:px-8">
@@ -90,10 +116,10 @@ const AccessoriesProducts = () => {
                   <img 
                     src={product.imageUrl} 
                     alt={product.title}
-                    className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500 bg-gray-700"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                      e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22300%22%20height%3D%22200%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22100%22%20font-size%3D%2220%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
                     }}
                   />
                 </div>
@@ -112,10 +138,21 @@ const AccessoriesProducts = () => {
                         Details
                       </Link>
                       <button 
-                        className="p-2 bg-green-600 hover:bg-green-700 rounded-lg flex items-center justify-center"
-                        onClick={() => {/* Add to cart functionality */}}
+                        className={`${
+                          addedToCartMap[product._id] 
+                            ? 'px-3 bg-green-700' 
+                            : 'p-2 bg-green-600 hover:bg-green-700'
+                        } rounded-lg flex items-center justify-center transition-all duration-300`}
+                        onClick={() => handleAddToCart(product)}
                       >
-                        <FaShoppingCart />
+                        {addedToCartMap[product._id] ? (
+                          <>
+                            <FaCheck className="mr-1" />
+                            <span className="text-xs">Added</span>
+                          </>
+                        ) : (
+                          <FaShoppingCart />
+                        )}
                       </button>
                     </div>
                   </div>

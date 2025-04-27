@@ -61,15 +61,16 @@ const Cart = ({ isOpen, onClose }) => {
                   <div className="flex items-center space-x-4">
                     <img
                       src={item.image}
-                      alt={`${item.value}$ Gift Card`}
-                      className="h-16 w-16 rounded-lg object-cover border border-purple-700"
+                      alt={item.title}
+                      className="h-16 w-16 rounded-lg object-cover border border-purple-700 bg-gray-700"
                       onError={(e) => {
-                        e.target.src = `https://via.placeholder.com/64?text=$${item.value}`;
+                        e.target.onerror = null;
+                        e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2264%22%20height%3D%2264%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2232%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
                       }}
                     />
                     <div>
-                      <h3 className="font-semibold text-[#FFF7D1]">${item.value} Gift Card</h3>
-                      <p className="text-sm text-purple-300">{item.priceJOD.toFixed(2)} JOD</p>
+                      <h3 className="font-semibold text-[#FFF7D1]">{item.title}</h3>
+                      <p className="text-sm text-purple-300">${item.price.toFixed(2)}</p>
                     </div>
                   </div>
 
@@ -106,7 +107,7 @@ const Cart = ({ isOpen, onClose }) => {
             <div className="border-t border-purple-700 px-6 py-4">
               <div className="flex justify-between text-lg font-semibold mb-4">
                 <span>Total:</span>
-                <span>{getCartTotal().toFixed(2)} JOD</span>
+                <span>${getCartTotal().toFixed(2)}</span>
               </div>
               <button
                 onClick={handleCheckout}

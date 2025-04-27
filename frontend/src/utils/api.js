@@ -123,12 +123,12 @@ export const getTournamentParticipants = (id) => {
 };
 
 // Store/Product APIs - supporting both endpoints
-export const getAllProducts = (queryParams) => {
+export const getAllProducts = (queryParams, triedFallback = false) => {
   // Try both endpoints with fallback
   return api.get('/store', { params: queryParams })
     .catch(error => {
-      // If store endpoint fails, try products endpoint
-      if (error.response?.status === 404) {
+      // If store endpoint fails, try products endpoint, but only once
+      if (error.response?.status === 404 && !triedFallback) {
         console.log('Store endpoint not found, trying products endpoint');
         return api.get('/products', { params: queryParams });
       }
@@ -148,23 +148,23 @@ export const getProductById = (id) => {
     });
 };
 
-export const createProduct = (productData) => {
-  return api.post('/store', productData)
+export const createProduct = (productData, triedFallback = false) => {
+  return api.post('/store/public/create', productData)
     .catch(error => {
-      // If store endpoint fails, try products endpoint
-      if (error.response?.status === 404) {
-        console.log('Store create endpoint not found, trying products endpoint');
-        return api.post('/products', productData);
+      // If public create endpoint fails, try the original endpoint
+      if (error.response?.status === 404 && !triedFallback) {
+        console.log('Public create endpoint not found, trying original endpoint');
+        return api.post('/store', productData);
       }
       throw error;
     });
 };
 
-export const updateProduct = (id, productData) => {
+export const updateProduct = (id, productData, triedFallback = false) => {
   return api.put(`/store/${id}`, productData)
     .catch(error => {
-      // If store endpoint fails, try products endpoint
-      if (error.response?.status === 404) {
+      // If store endpoint fails, try products endpoint, but only once
+      if (error.response?.status === 404 && !triedFallback) {
         console.log('Store update endpoint not found, trying products endpoint');
         return api.put(`/products/${id}`, productData);
       }
@@ -172,11 +172,11 @@ export const updateProduct = (id, productData) => {
     });
 };
 
-export const deleteProduct = (id) => {
+export const deleteProduct = (id, triedFallback = false) => {
   return api.delete(`/store/${id}`)
     .catch(error => {
-      // If store endpoint fails, try products endpoint
-      if (error.response?.status === 404) {
+      // If store endpoint fails, try products endpoint, but only once
+      if (error.response?.status === 404 && !triedFallback) {
         console.log('Store delete endpoint not found, trying products endpoint');
         return api.delete(`/products/${id}`);
       }

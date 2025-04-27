@@ -19,6 +19,7 @@ import AdminRoutes from "./components/routes/AdminRoutes";
 import AboutUs from "./components/aboutus/AboutUs";
 import AccessoriesProducts from "./components/store/AccessoriesProducts";
 import ProductDetails from "./components/store/ProductDetails";
+import CartPage from "./components/store/CartPage";
 
 
 // ⬇️ Nested app to access location
@@ -39,8 +40,10 @@ const AppContent = () => {
         <Route path="/store" element={<Store />} />
         <Route path="/store/:platformId" element={<PlatformCards />} />
         <Route path="/store/:platformId/card/:cardId" element={<CardDetails />} />
+        <Route path="/store/:platformId/product/:productId" element={<ProductDetails />} />
         <Route path="/store/accessories/:categoryId" element={<AccessoriesProducts />} />
         <Route path="/store/accessories/:categoryId/product/:productId" element={<ProductDetails />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/tournaments/:id" element={<TournamentDetails />} />
         <Route path="/tournaments/:id/checkout" element={<TournamentCheckout />} />

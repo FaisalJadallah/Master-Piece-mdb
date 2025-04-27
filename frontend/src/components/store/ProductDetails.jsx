@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaArrowLeft, FaShoppingCart, FaStar, FaBox } from 'react-icons/fa';
+import { FaArrowLeft, FaShoppingCart, FaStar, FaBox, FaCheck } from 'react-icons/fa';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { useCart } from '../../context/CartContext';
 
 const ProductDetails = () => {
   const { categoryId, productId } = useParams();
@@ -11,13 +12,22 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/store/${productId}`);
+        const response = await axios.get(`http://localhost:5000/store/${productId}`);
         setProduct(response.data);
+        
+        if (response.data.category === 'accessories') {
+          console.log('This is an accessory product');
+        } else if (response.data.category === 'game') {
+          console.log('This is a game product');
+        }
+        
         setError(null);
       } catch (err) {
         console.error('Error fetching product details:', err);
@@ -31,9 +41,25 @@ const ProductDetails = () => {
   }, [productId]);
 
   const handleAddToCart = () => {
-    // Implement add to cart functionality here
-    console.log(`Added ${quantity} of ${product.title} to cart`);
-    // Show success message or redirect to cart
+    if (product) {
+      const cartItem = {
+        id: product._id,
+        title: product.title,
+        price: product.price,
+        image: product.imageUrl,
+        quantity: quantity,
+        category: product.category,
+        platform: product.platform
+      };
+      
+      addToCart(cartItem);
+      setAddedToCart(true);
+      
+      // Reset the "Added to cart" indicator after 2 seconds
+      setTimeout(() => {
+        setAddedToCart(false);
+      }, 2000);
+    }
   };
 
   const handleQuantityChange = (e) => {
@@ -43,12 +69,30 @@ const ProductDetails = () => {
     }
   };
 
+  // Function to navigate back based on product category
+  const navigateBack = () => {
+    if (product) {
+      if (product.category === 'accessories' && categoryId) {
+        navigate(`/store/accessories/${categoryId}`);
+      } else if (product.category === 'game' && product.platform) {
+        // Convert platform to lowercase and replace spaces with hyphens
+        const platformSlug = product.platform.toLowerCase().replace(/\s+/g, '-');
+        navigate(`/store/${platformSlug}`);
+      } else {
+        // Default fallback
+        navigate(-1);
+      }
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center mb-8">
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={navigateBack} 
             className="flex items-center text-[#FFF7D1] hover:text-white transition-colors"
           >
             <FaArrowLeft className="mr-2" />
@@ -73,10 +117,10 @@ const ProductDetails = () => {
                   <img 
                     src={product.imageUrl} 
                     alt={product.title}
-                    className="w-full h-auto object-cover"
+                    className="w-full h-auto object-cover bg-gray-700"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/600x400?text=No+Image';
+                      e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22600%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22600%22%20height%3D%22400%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%22300%22%20y%3D%22200%22%20font-size%3D%2230%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
                     }}
                   />
                 </div>
@@ -133,17 +177,28 @@ const ProductDetails = () => {
                     onClick={handleAddToCart}
                     disabled={product.stock <= 0}
                     className={`flex-1 py-3 rounded-lg flex items-center justify-center space-x-2 ${
-                      product.stock > 0
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-gray-700 cursor-not-allowed'
-                    }`}
+                      addedToCart 
+                        ? 'bg-green-700'
+                        : product.stock > 0
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'bg-gray-700 cursor-not-allowed'
+                    } transition-colors`}
                   >
-                    <FaShoppingCart />
-                    <span>Add to Cart</span>
+                    {addedToCart ? (
+                      <>
+                        <FaCheck />
+                        <span>Added to Cart</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaShoppingCart />
+                        <span>Add to Cart</span>
+                      </>
+                    )}
                   </button>
                   
                   <Link 
-                    to={`/cart`}
+                    to="/cart"
                     className="px-6 py-3 bg-[#6A42C2] hover:bg-[#8B5DFF] rounded-lg transition-colors"
                   >
                     View Cart

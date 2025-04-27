@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Gamepad2, Menu, X, User, ArrowUp } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { FaShoppingCart } from 'react-icons/fa';
+import { useCart } from '../../context/CartContext';
+
+// Cart indicator component to show number of items in cart
+const CartIndicator = () => {
+  const { getCartItemsCount } = useCart();
+  const count = getCartItemsCount();
+  
+  if (count === 0) return null;
+  
+  return (
+    <span className="absolute -top-2 -right-2 bg-amber-400 text-purple-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+      {count}
+    </span>
+  );
+};
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -159,6 +176,15 @@ const Navbar = () => {
 
           {/* Right Side */}
           <div className="flex items-center gap-4">
+            <Link
+              to="/cart"
+              className="bg-purple-700 hover:bg-purple-600 text-white p-2 rounded-full transition-colors relative"
+              aria-label="Shopping Cart"
+            >
+              <FaShoppingCart size={20} />
+              <CartIndicator />
+            </Link>
+            
             {isLoggedIn ? (
               <>
                 <button
@@ -234,6 +260,7 @@ const Navbar = () => {
             <li><NavLink to="/tournaments">Tournaments</NavLink></li>
             <li><NavLink to="/store">Store</NavLink></li>
             <li><NavLink to="/news">News</NavLink></li>
+            <li><NavLink to="/cart">Cart</NavLink></li>
             {!isLoggedIn && (
               <>
                 <li><NavLink to="/login">Login</NavLink></li>

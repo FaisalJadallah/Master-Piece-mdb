@@ -10,16 +10,25 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Create products directory inside uploads
+const productsDir = path.join(uploadDir, 'products');
+if (!fs.existsSync(productsDir)) {
+  fs.mkdirSync(productsDir, { recursive: true });
+}
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadDir);
+    // Save product images to the products directory
+    const isProduct = req.query.type === 'product';
+    cb(null, isProduct ? productsDir : uploadDir);
   },
   filename: function (req, file, cb) {
     // Create unique filename with original extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const ext = path.extname(file.originalname);
-    cb(null, 'image-' + uniqueSuffix + ext);
+    const prefix = req.query.type || 'image';
+    cb(null, `${prefix}-${uniqueSuffix}${ext}`);
   }
 });
 
@@ -49,13 +58,27 @@ router.post('/', upload.single('image'), (req, res) => {
     }
     
     // Construct the URL for the uploaded file
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const relativePath = req.file.path.split('uploads')[1].replace(/\\/g, '/');
+    const fileUrl = `/uploads${relativePath}`;
+    const fullUrl = `${baseUrl}${fileUrl}`;
+    
+    console.log('File uploaded successfully:', {
+      filename: req.file.filename,
+      path: req.file.path,
+      relativePath,
+      fileUrl,
+      fullUrl
+    });
     
     res.status(200).json({ 
       message: 'File uploaded successfully',
-      fileUrl: fileUrl
+      fileUrl: fileUrl,
+      fullUrl: fullUrl,
+      filename: req.file.filename
     });
   } catch (error) {
+    console.error('Upload error:', error);
     res.status(500).json({ message: error.message });
   }
 });

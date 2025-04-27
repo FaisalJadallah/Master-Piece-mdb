@@ -20,8 +20,11 @@ const getAllProducts = asyncHandler(async (req, res) => {
   const category = req.query.category ? { category: req.query.category } : {};
   const platform = req.query.platform ? { platform: req.query.platform } : {};
   
-  const count = await Product.countDocuments({ ...keyword, ...category, ...platform });
-  const products = await Product.find({ ...keyword, ...category, ...platform })
+  // Add support for subcategory filtering (for accessories)
+  const subcategory = req.query.subcategory ? { subcategory: req.query.subcategory } : {};
+  
+  const count = await Product.countDocuments({ ...keyword, ...category, ...platform, ...subcategory });
+  const products = await Product.find({ ...keyword, ...category, ...platform, ...subcategory })
     .limit(pageSize)
     .skip(pageSize * (page - 1))
     .sort({ createdAt: -1 });
@@ -53,6 +56,7 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     imageUrl,
     category,
+    subcategory,
     platform,
     stock,
     featured,
@@ -65,6 +69,7 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     imageUrl,
     category,
+    subcategory,
     platform,
     stock,
     featured: featured || false,
@@ -85,6 +90,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     price,
     imageUrl,
     category,
+    subcategory,
     platform,
     stock,
     featured,
@@ -99,6 +105,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.price = price || product.price;
     product.imageUrl = imageUrl || product.imageUrl;
     product.category = category || product.category;
+    product.subcategory = subcategory || product.subcategory;
     product.platform = platform || product.platform;
     product.stock = stock || product.stock;
     product.featured = featured !== undefined ? featured : product.featured;

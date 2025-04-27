@@ -23,6 +23,7 @@ const StoreManagement = () => {
     imageUrl: '',
     platform: 'steam',
     category: 'game',
+    subcategory: 'headphones',
     stock: 10,
     type: 'digital'
   });
@@ -34,8 +35,8 @@ const StoreManagement = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // Using the centralized API utility which handles authentication
-      const response = await getAllProducts();
+      // Using the centralized API utility which handles authentication, set triedFallback to true to avoid loops
+      const response = await getAllProducts({}, true);
       
       // Check if response.data is an array or contains a products property
       if (Array.isArray(response.data)) {
@@ -85,6 +86,7 @@ const StoreManagement = () => {
       imageUrl: '',
       platform: 'steam',
       category: 'game',
+      subcategory: 'headphones',
       stock: 10,
       type: 'digital'
     });
@@ -104,8 +106,9 @@ const StoreManagement = () => {
       imageUrl: product.imageUrl,
       platform: product.platform || 'steam',
       category: product.category || 'game',
+      subcategory: product.subcategory || 'headphones',
       stock: isNaN(stock) ? 0 : stock,
-      type: product.type || 'digital'
+      type: product.category === 'accessories' ? 'accessory' : 'digital'
     });
     setShowForm(true);
   };
@@ -126,20 +129,22 @@ const StoreManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Create a simpler, more compatible product object
-    // Focus only on the essential fields to minimize potential issues
+    // Create a product object with common fields
     const productData = {
       title: formData.title,
       description: formData.description,
       price: isNaN(parseFloat(formData.price)) ? 0 : parseFloat(formData.price),
       imageUrl: formData.imageUrl,
-      category: formData.type === 'accessory' ? 'accessories' : 'game',
       stock: isNaN(parseInt(formData.stock)) ? 0 : parseInt(formData.stock),
     };
     
-    // Only add platform if it's a digital product
+    // Add product type specific fields
     if (formData.type === 'digital') {
+      productData.category = 'game';
       productData.platform = formData.platform;
+    } else if (formData.type === 'accessory') {
+      productData.category = 'accessories';
+      productData.subcategory = formData.subcategory;
     }
     
     // Log what we're sending to help debug
@@ -149,22 +154,15 @@ const StoreManagement = () => {
       let response;
       if (currentProduct) {
         // Update existing product using centralized API utility
-        response = await updateProduct(currentProduct._id, productData);
+        response = await updateProduct(currentProduct._id, productData, true);
         console.log('Update response:', response.data);
       } else {
         // Create new product using centralized API utility
-        try {
-          response = await createProduct(productData);
-        } catch (err) {
-          // If the centralized utility fails, try a direct POST as fallback
-          console.log('Trying direct API call as fallback');
-          
-          // Use the API instance that has the interceptors
-          response = await api.post('/store', productData);
-        }
+        response = await createProduct(productData, true);
         console.log('Create response:', response.data);
       }
-      fetchProducts();
+      
+      await fetchProducts();
       resetForm();
       setShowForm(false);
     } catch (err) {
@@ -191,6 +189,7 @@ const StoreManagement = () => {
   };
 
   const handleFileUploaded = (fileUrl) => {
+    console.log('File uploaded successfully, URL:', fileUrl);
     setFormData(prev => ({
       ...prev,
       imageUrl: fileUrl
@@ -268,32 +267,12 @@ const StoreManagement = () => {
                     <option value="accessory">Gaming Accessory</option>
                   </select>
                 </div>
-                {formData.type === 'digital' ? (
+                {formData.type === 'accessory' && (
                   <div>
-                    <label className="block text-gray-400 mb-2">Platform</label>
+                    <label className="block text-gray-400 mb-2">Accessory Type</label>
                     <select
-                      name="platform"
-                      value={formData.platform}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B5DFF]"
-                    >
-                      <option value="steam">Steam</option>
-                      <option value="origin">Origin</option>
-                      <option value="epic">Epic Games</option>
-                      <option value="uplay">Ubisoft Connect</option>
-                      <option value="battlenet">Battle.net</option>
-                      <option value="microsoft">Microsoft Store</option>
-                      <option value="playstation">PlayStation</option>
-                      <option value="xbox">Xbox</option>
-                      <option value="nintendo">Nintendo</option>
-                    </select>
-                  </div>
-                ) : (
-                  <div>
-                    <label className="block text-gray-400 mb-2">Accessory Category</label>
-                    <select
-                      name="category"
-                      value={formData.category}
+                      name="subcategory"
+                      value={formData.subcategory}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B5DFF]"
                     >
@@ -303,6 +282,25 @@ const StoreManagement = () => {
                       <option value="controllers">Controllers</option>
                       <option value="chairs">Gaming Chairs</option>
                       <option value="monitors">Gaming Monitors</option>
+                      <option value="other">Other Accessories</option>
+                    </select>
+                  </div>
+                )}
+                {formData.type === 'digital' && (
+                  <div>
+                    <label className="block text-gray-400 mb-2">Platform</label>
+                    <select
+                      name="platform"
+                      value={formData.platform}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B5DFF]"
+                    >
+                      <option value="steam">Steam</option>
+                      <option value="playstation">PlayStation</option>
+                      <option value="xbox">Xbox</option>
+                      <option value="nintendo">Nintendo</option>
+                      <option value="epic-games">Epic Games</option>
+                      <option value="google-play">Google Play</option>
                     </select>
                   </div>
                 )}
@@ -340,15 +338,18 @@ const StoreManagement = () => {
                       Upload Image
                     </button>
                     {formData.imageUrl && (
-                      <img
-                        src={formData.imageUrl}
-                        alt="Product"
-                        className="w-20 h-20 object-cover rounded-md"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/80';
-                        }}
-                      />
+                      <>
+                        <img
+                          src={formData.imageUrl}
+                          alt="Product"
+                          className="w-20 h-20 object-cover rounded-md bg-gray-700"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2280%22%20height%3D%2280%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2240%22%20y%3D%2240%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
+                          }}
+                        />
+                        <p className="text-xs text-gray-400 break-all max-w-[150px]">{formData.imageUrl}</p>
+                      </>
                     )}
                   </div>
                 </div>
@@ -395,10 +396,12 @@ const StoreManagement = () => {
                         <img
                           src={product.imageUrl}
                           alt={product.title}
-                          className="w-10 h-10 object-cover rounded-md"
+                          className="w-10 h-10 object-cover rounded-md bg-gray-700"
                           onError={(e) => {
+                            // Prevent infinite loop by removing the onerror handler first
                             e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/40';
+                            // Set a data URI as fallback instead of via.placeholder.com
+                            e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2220%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
                           }}
                         />
                         <span>{product.title}</span>
@@ -432,6 +435,27 @@ const StoreManagement = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {showImageUploader && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 rounded-lg w-full max-w-md">
+              <div className="flex justify-between items-center p-4 border-b border-gray-700">
+                <h3 className="text-lg font-semibold">Upload Product Image</h3>
+                <button 
+                  onClick={() => setShowImageUploader(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-4">
+                <FileUploader 
+                  onFileUploaded={handleFileUploaded} 
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>
