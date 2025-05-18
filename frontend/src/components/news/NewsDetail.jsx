@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { FaArrowLeft, FaCalendarAlt, FaUser, FaClock, FaShareAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaCalendarAlt, FaUser, FaClock, FaShareAlt, FaTag } from 'react-icons/fa';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { getNewsById } from '../../utils/api';
 
 const NewsDetail = () => {
-  const { articleId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ const NewsDetail = () => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/news/${articleId}`);
+        const response = await getNewsById(id);
         setArticle(response.data);
         setError(null);
       } catch (err) {
@@ -27,7 +27,7 @@ const NewsDetail = () => {
     };
 
     fetchArticle();
-  }, [articleId]);
+  }, [id]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -67,6 +67,11 @@ const NewsDetail = () => {
     return content.split('\n').map((paragraph, index) => (
       paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
     ));
+  };
+
+  // Navigate to news page with selected tag
+  const handleTagClick = (tag) => {
+    navigate(`/news?tag=${encodeURIComponent(tag)}`);
   };
 
   return (
@@ -109,6 +114,21 @@ const NewsDetail = () => {
                   e.target.src = 'https://via.placeholder.com/1200x600?text=Article+Image';
                 }}
               />
+              
+              {/* Tags positioned on top of the image */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="absolute top-4 right-4 flex flex-wrap gap-2 justify-end max-w-[60%]">
+                  {article.tags.map((tag, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTagClick(tag)}
+                      className="px-3 py-1 bg-[#6A42C2] bg-opacity-90 hover:bg-opacity-100 rounded-full text-sm text-white transition-colors flex items-center"
+                    >
+                      <FaTag className="mr-1" size={10} /> {tag}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* Content */}
@@ -153,21 +173,36 @@ const NewsDetail = () => {
                 {formatContent(article.content)}
               </div>
               
-              {/* Tags */}
+              {/* Tags at bottom */}
               {article.tags && article.tags.length > 0 && (
                 <div className="mt-10 pt-6 border-t border-gray-700">
+                  <h3 className="text-gray-400 mb-3 flex items-center">
+                    <FaTag className="mr-2" /> Related Tags:
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {article.tags.map((tag, index) => (
-                      <span 
+                      <button
                         key={index}
-                        className="px-3 py-1 bg-[#3a3650] rounded-full text-sm text-gray-300"
+                        onClick={() => handleTagClick(tag)}
+                        className="px-3 py-1 bg-[#3a3650] hover:bg-[#6A42C2] rounded-full text-sm text-gray-300 hover:text-white transition-colors"
                       >
                         {tag}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
+              
+              {/* Back to News button */}
+              <div className="mt-8 pt-6 border-t border-gray-700">
+                <button 
+                  onClick={() => navigate('/news')}
+                  className="px-6 py-3 bg-[#6A42C2] hover:bg-[#8B5DFF] rounded-lg transition-colors flex items-center"
+                >
+                  <FaArrowLeft className="mr-2" />
+                  Back to All News
+                </button>
+              </div>
             </div>
           </article>
         ) : (

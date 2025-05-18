@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowLeft, FaEdit, FaTrash, FaUserAlt, FaUserShield, FaLock } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaTrash, FaUserAlt, FaUserShield, FaLock, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { getAllUsers, updateUserRole as apiUpdateUserRole, deleteUser as apiDeleteUser } from '../../utils/api';
 
@@ -12,6 +12,10 @@ const UserManagement = () => {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [userToUpdate, setUserToUpdate] = useState(null);
   const [debugInfo, setDebugInfo] = useState(null);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(7);
 
   useEffect(() => {
     fetchUsers();
@@ -97,6 +101,18 @@ const UserManagement = () => {
     }
   };
 
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / usersPerPage);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
@@ -128,59 +144,112 @@ const UserManagement = () => {
             <p className="text-xl text-gray-400">No users found</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full bg-gray-800 rounded-lg overflow-hidden">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="p-3 text-left">Username</th>
-                  <th className="p-3 text-left">Email</th>
-                  <th className="p-3 text-left">Role</th>
-                  <th className="p-3 text-left">Joined</th>
-                  <th className="p-3 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user._id} className="border-t border-gray-700 hover:bg-gray-750">
-                    <td className="p-3 flex items-center gap-2">
-                      <FaUserAlt className="text-gray-400" />
-                      {user.username}
-                    </td>
-                    <td className="p-3">{user.email}</td>
-                    <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        user.role === 'admin' ? 'bg-red-900 text-red-200' : 'bg-blue-900 text-blue-200'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => openRoleModal(user)}
-                          className="p-2 text-blue-400 hover:text-blue-300"
-                          title="Change Role"
-                        >
-                          <FaUserShield />
-                        </button>
-                        <button
-                          onClick={() => confirmDeleteUser(user)}
-                          disabled={user.role === 'admin'}
-                          className={user.role === 'admin' ? 'p-2 text-gray-500 cursor-not-allowed' : 'p-2 text-red-400 hover:text-red-300'}
-                          title={user.role === 'admin' ? 'Cannot delete admin users' : 'Delete User'}
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full bg-gray-800 rounded-lg overflow-hidden">
+                <thead className="bg-gray-700">
+                  <tr>
+                    <th className="p-3 text-left">Username</th>
+                    <th className="p-3 text-left">Email</th>
+                    <th className="p-3 text-left">Role</th>
+                    <th className="p-3 text-left">Joined</th>
+                    <th className="p-3 text-center">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {currentUsers.map((user) => (
+                    <tr key={user._id} className="border-t border-gray-700 hover:bg-gray-750">
+                      <td className="p-3 flex items-center gap-2">
+                        <FaUserAlt className="text-gray-400" />
+                        {user.username}
+                      </td>
+                      <td className="p-3">{user.email}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          user.role === 'admin' ? 'bg-red-900 text-red-200' : 'bg-blue-900 text-blue-200'
+                        }`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => openRoleModal(user)}
+                            className="p-2 text-blue-400 hover:text-blue-300"
+                            title="Change Role"
+                          >
+                            <FaUserShield />
+                          </button>
+                          <button
+                            onClick={() => confirmDeleteUser(user)}
+                            disabled={user.role === 'admin'}
+                            className={user.role === 'admin' ? 'p-2 text-gray-500 cursor-not-allowed' : 'p-2 text-red-400 hover:text-red-300'}
+                            title={user.role === 'admin' ? 'Cannot delete admin users' : 'Delete User'}
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {users.length > usersPerPage && (
+              <div className="mt-6 flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Showing {indexOfFirstUser + 1}-{Math.min(indexOfLastUser, users.length)} of {users.length} users
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-md ${
+                      currentPage === 1 
+                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                        : 'bg-purple-700 hover:bg-purple-600 text-white'
+                    }`}
+                  >
+                    <FaChevronLeft size={14} />
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  <div className="flex space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                      <button
+                        key={number}
+                        onClick={() => paginate(number)}
+                        className={`w-8 h-8 rounded-md ${
+                          currentPage === number
+                            ? 'bg-purple-600 text-white font-bold'
+                            : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                        }`}
+                      >
+                        {number}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-md ${
+                      currentPage === totalPages 
+                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                        : 'bg-purple-700 hover:bg-purple-600 text-white'
+                    }`}
+                  >
+                    <FaChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

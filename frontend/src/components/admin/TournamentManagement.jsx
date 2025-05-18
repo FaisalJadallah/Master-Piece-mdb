@@ -23,6 +23,10 @@ const TournamentManagement = () => {
     registrationFee: 10,
     status: 'upcoming'
   });
+  // Get today's date in YYYY-MM-DDThh:mm format for the min attribute
+  const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  const minDate = today.toISOString().slice(0, 16);
 
   // Fetch tournaments on component mount
   useEffect(() => {
@@ -67,12 +71,23 @@ const TournamentManagement = () => {
 
   const handleEdit = (tournament) => {
     setCurrentTournament(tournament);
+    
+    // Convert tournament date to local datetime format
+    let tournamentDate = new Date(tournament.dateTime);
+    let formattedDate = tournamentDate.toISOString().slice(0, 16);
+    
+    // If the tournament date is in the past, set it to today's date
+    const now = new Date();
+    if (tournamentDate < now) {
+      formattedDate = minDate;
+    }
+    
     setFormData({
       gameName: tournament.gameName,
       imageUrl: tournament.imageUrl,
       description: tournament.description || '',
       numberOfPlayers: tournament.numberOfPlayers,
-      dateTime: new Date(tournament.dateTime).toISOString().slice(0, 16),
+      dateTime: formattedDate,
       prize: tournament.prize,
       registrationFee: tournament.registrationFee || 10,
       status: tournament.status
@@ -94,6 +109,16 @@ const TournamentManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate that the selected date is not in the past
+    const selectedDate = new Date(formData.dateTime);
+    const currentDate = new Date();
+    
+    if (selectedDate < currentDate) {
+      setError('Tournament date cannot be in the past. Please select a future date and time.');
+      return;
+    }
+    
     try {
       if (currentTournament) {
         // Update existing tournament
@@ -240,6 +265,7 @@ const TournamentManagement = () => {
                     name="dateTime"
                     value={formData.dateTime}
                     onChange={handleInputChange}
+                    min={minDate}
                     className="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B5DFF]"
                     required
                   />

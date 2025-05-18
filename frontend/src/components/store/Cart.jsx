@@ -10,6 +10,7 @@ const Cart = ({ isOpen, onClose }) => {
     updateQuantity,
     getCartTotal,
     clearCart,
+    hasPhysicalItems,
   } = useCart();
 
   const [showPayment, setShowPayment] = React.useState(false);
@@ -71,6 +72,9 @@ const Cart = ({ isOpen, onClose }) => {
                     <div>
                       <h3 className="font-semibold text-[#FFF7D1]">{item.title}</h3>
                       <p className="text-sm text-purple-300">${item.price.toFixed(2)}</p>
+                      {item.isPhysical && (
+                        <span className="text-xs bg-purple-900 text-purple-200 px-1 py-0.5 rounded">Physical</span>
+                      )}
                     </div>
                   </div>
 
@@ -109,6 +113,13 @@ const Cart = ({ isOpen, onClose }) => {
                 <span>Total:</span>
                 <span>${getCartTotal().toFixed(2)}</span>
               </div>
+              {hasPhysicalItems() && (
+                <div className="mb-4 p-3 bg-[#2f2b44] rounded-lg border border-purple-700">
+                  <p className="text-sm text-purple-200">
+                    <span className="font-semibold">Note:</span> Your cart contains physical items that require shipping.
+                  </p>
+                </div>
+              )}
               <button
                 onClick={handleCheckout}
                 className="w-full bg-[#8B5DFF] hover:bg-[#6A42C2] text-white py-3 rounded-xl shadow-md transition-all duration-300"

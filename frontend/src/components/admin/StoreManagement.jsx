@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaGamepad } from 'react-icons/fa';
+import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaGamepad, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import FileUploader from './FileUploader';
 import api, { 
@@ -27,6 +27,10 @@ const StoreManagement = () => {
     stock: 10,
     type: 'digital'
   });
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(7);
 
   useEffect(() => {
     fetchProducts();
@@ -57,6 +61,18 @@ const StoreManagement = () => {
       setProducts([]); // Ensure products is an array even on error
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Pagination logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(products.length / productsPerPage);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
     }
   };
 
@@ -376,66 +392,119 @@ const StoreManagement = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full bg-gray-800 rounded-lg overflow-hidden">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="p-3 text-left">Product</th>
-                  <th className="p-3 text-left">Type</th>
-                  <th className="p-3 text-left">Category</th>
-                  <th className="p-3 text-left">Price</th>
-                  <th className="p-3 text-left">Stock</th>
-                  <th className="p-3 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product._id} className="border-t border-gray-700">
-                    <td className="p-3">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={product.imageUrl}
-                          alt={product.title}
-                          className="w-10 h-10 object-cover rounded-md bg-gray-700"
-                          onError={(e) => {
-                            // Prevent infinite loop by removing the onerror handler first
-                            e.target.onerror = null;
-                            // Set a data URI as fallback instead of via.placeholder.com
-                            e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2220%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
-                          }}
-                        />
-                        <span>{product.title}</span>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      {product.type === 'digital' ? 'Digital' : 'Accessory'}
-                    </td>
-                    <td className="p-3">
-                      {product.type === 'digital' ? product.platform : product.category}
-                    </td>
-                    <td className="p-3">${product.price.toFixed(2)}</td>
-                    <td className="p-3">{product.stock}</td>
-                    <td className="p-3">
-                      <div className="flex justify-center gap-4">
-                        <button
-                          onClick={() => handleEdit(product)}
-                          className="text-blue-400 hover:text-blue-300"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product._id)}
-                          className="text-red-400 hover:text-red-300"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full bg-gray-800 rounded-lg overflow-hidden">
+                <thead className="bg-gray-700">
+                  <tr>
+                    <th className="p-3 text-left">Product</th>
+                    <th className="p-3 text-left">Type</th>
+                    <th className="p-3 text-left">Category</th>
+                    <th className="p-3 text-left">Price</th>
+                    <th className="p-3 text-left">Stock</th>
+                    <th className="p-3 text-center">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {currentProducts.map((product) => (
+                    <tr key={product._id} className="border-t border-gray-700">
+                      <td className="p-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={product.imageUrl}
+                            alt={product.title}
+                            className="w-10 h-10 object-cover rounded-md bg-gray-700"
+                            onError={(e) => {
+                              // Prevent infinite loop by removing the onerror handler first
+                              e.target.onerror = null;
+                              // Set a data URI as fallback instead of via.placeholder.com
+                              e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2220%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
+                            }}
+                          />
+                          <span>{product.title}</span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        {product.type === 'digital' ? 'Digital' : 'Accessory'}
+                      </td>
+                      <td className="p-3">
+                        {product.type === 'digital' ? product.platform : product.category}
+                      </td>
+                      <td className="p-3">${product.price.toFixed(2)}</td>
+                      <td className="p-3">{product.stock}</td>
+                      <td className="p-3">
+                        <div className="flex justify-center gap-4">
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="text-blue-400 hover:text-blue-300"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product._id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            {products.length > productsPerPage && (
+              <div className="mt-6 flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, products.length)} of {products.length} products
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-md ${
+                      currentPage === 1 
+                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                        : 'bg-purple-700 hover:bg-purple-600 text-white'
+                    }`}
+                  >
+                    <FaChevronLeft size={14} />
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  <div className="flex space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                      <button
+                        key={number}
+                        onClick={() => paginate(number)}
+                        className={`w-8 h-8 rounded-md ${
+                          currentPage === number
+                            ? 'bg-purple-600 text-white font-bold'
+                            : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                        }`}
+                      >
+                        {number}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-md ${
+                      currentPage === totalPages 
+                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                        : 'bg-purple-700 hover:bg-purple-600 text-white'
+                    }`}
+                  >
+                    <FaChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {showImageUploader && (

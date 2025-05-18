@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaEye, FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import api from '../../utils/api';
+import { getAllNews, createNews, updateNews, deleteNews } from '../../utils/api';
 import FileUploader from './FileUploader';
 
 const NewsManagement = () => {
   const [articles, setArticles] = useState([]);
+  const [filteredArticles, setFilteredArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [currentArticle, setCurrentArticle] = useState(null);
   const [showImageUploader, setShowImageUploader] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -25,17 +27,38 @@ const NewsManagement = () => {
     fetchArticles();
   }, []);
 
+  useEffect(() => {
+    // Filter articles based on search term
+    if (searchTerm.trim() === '') {
+      setFilteredArticles(articles);
+    } else {
+      const term = searchTerm.toLowerCase();
+      const filtered = articles.filter(
+        article => 
+          article.title.toLowerCase().includes(term) || 
+          (article.content && article.content.toLowerCase().includes(term)) ||
+          (article.summary && article.summary.toLowerCase().includes(term)) ||
+          (article.author && article.author.toLowerCase().includes(term)) ||
+          (article.tags && article.tags.some(tag => tag.toLowerCase().includes(term)))
+      );
+      setFilteredArticles(filtered);
+    }
+  }, [searchTerm, articles]);
+
   const fetchArticles = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/news');
+      const response = await getAllNews();
       
       if (Array.isArray(response.data)) {
         setArticles(response.data);
+        setFilteredArticles(response.data);
       } else if (response.data.articles && Array.isArray(response.data.articles)) {
         setArticles(response.data.articles);
+        setFilteredArticles(response.data.articles);
       } else {
         setArticles([]);
+        setFilteredArticles([]);
         setError('Unexpected data format received from server');
         console.error('Unexpected data format:', response.data);
       }
@@ -45,6 +68,7 @@ const NewsManagement = () => {
       setError('Failed to fetch articles. ' + (err.response?.data?.message || err.message));
       console.error('Error fetching articles:', err);
       setArticles([]);
+      setFilteredArticles([]);
     } finally {
       setLoading(false);
     }
@@ -64,6 +88,10 @@ const NewsManagement = () => {
         [name]: value
       }));
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   const resetForm = () => {
@@ -96,8 +124,9 @@ const NewsManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this article?')) {
       try {
-        await api.delete(`/news/${id}`);
+        await deleteNews(id);
         setArticles(articles.filter(article => article._id !== id));
+        setFilteredArticles(filteredArticles.filter(article => article._id !== id));
       } catch (err) {
         setError('Failed to delete article. ' + (err.response?.data?.message || err.message));
         console.error('Error deleting article:', err);
@@ -117,11 +146,11 @@ const NewsManagement = () => {
     try {
       if (currentArticle) {
         // Update existing article
-        const response = await api.put(`/news/${currentArticle._id}`, processedData);
+        const response = await updateNews(currentArticle._id, processedData);
         console.log('Update response:', response.data);
       } else {
         // Create new article
-        const response = await api.post('/news', processedData);
+        const response = await createNews(processedData);
         console.log('Create response:', response.data);
       }
       fetchArticles();
@@ -294,6 +323,35 @@ const NewsManagement = () => {
           </div>
         )}
 
+        {/* Search bar for articles in admin view */}
+        {!showForm && !loading && articles.length > 0 && (
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                placeholder="Search articles..."
+                className="block w-full pl-10 pr-4 py-2 border-0 bg-gray-800 rounded-md focus:ring-2 focus:ring-[#8B5DFF] placeholder-gray-500 text-white focus:outline-none"
+              />
+            </div>
+            {searchTerm && (
+              <div className="mt-2 text-sm text-gray-400">
+                Found {filteredArticles.length} {filteredArticles.length === 1 ? 'article' : 'articles'} matching "{searchTerm}"
+                <button 
+                  className="ml-2 text-[#8B5DFF] hover:text-[#a17dff] transition-colors"
+                  onClick={() => setSearchTerm('')}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {showImageUploader && (
           <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-800 rounded-lg max-w-lg w-full">
@@ -322,6 +380,16 @@ const NewsManagement = () => {
               Click the "Add Article" button to create your first article
             </p>
           </div>
+        ) : filteredArticles.length === 0 && searchTerm ? (
+          <div className="bg-gray-800 rounded-lg p-8 text-center">
+            <p className="text-xl text-gray-400">No articles match your search criteria</p>
+            <button 
+              className="mt-4 text-[#8B5DFF] hover:text-[#a17dff] transition-colors"
+              onClick={() => setSearchTerm('')}
+            >
+              Clear search
+            </button>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full bg-gray-800 rounded-lg overflow-hidden">
@@ -335,7 +403,7 @@ const NewsManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {articles.map((article) => (
+                {filteredArticles.map((article) => (
                   <tr key={article._id} className="border-t border-gray-700">
                     <td className="p-3">
                       <div className="flex items-center gap-3">

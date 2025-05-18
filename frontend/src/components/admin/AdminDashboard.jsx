@@ -1,13 +1,30 @@
 // src/pages/AdminDashboard.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import { FaTrophy, FaUsers, FaStore, FaChartBar, FaNewspaper } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaTrophy, FaUsers, FaStore, FaChartBar, FaNewspaper, FaSignOutAlt } from "react-icons/fa";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userRole");
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-[#FFF7D1] mb-8">Admin Dashboard</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-[#FFF7D1]">Admin Dashboard</h1>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          >
+            <FaSignOutAlt /> Logout
+          </button>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Tournaments Card */}

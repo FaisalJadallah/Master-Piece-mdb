@@ -122,6 +122,27 @@ export const getTournamentParticipants = (id) => {
   return api.get(`/tournaments/${id}/participants`);
 };
 
+// News APIs
+export const getAllNews = () => {
+  return api.get('/news');
+};
+
+export const getNewsById = (id) => {
+  return api.get(`/news/${id}`);
+};
+
+export const createNews = (newsData) => {
+  return api.post('/news', newsData);
+};
+
+export const updateNews = (id, newsData) => {
+  return api.put(`/news/${id}`, newsData);
+};
+
+export const deleteNews = (id) => {
+  return api.delete(`/news/${id}`);
+};
+
 // Store/Product APIs - supporting both endpoints
 export const getAllProducts = (queryParams, triedFallback = false) => {
   // Try both endpoints with fallback

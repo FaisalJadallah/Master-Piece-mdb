@@ -1,19 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCreditCard, FaLock, FaPaypal, FaShoppingCart } from 'react-icons/fa';
+import { FaCreditCard, FaLock, FaPaypal, FaShoppingCart, FaMapMarkerAlt, FaArrowRight, FaPhone } from 'react-icons/fa';
+import { useCart } from '../../context/CartContext';
 
 const PaymentGateway = ({ amount, cardDetails, onClose }) => {
   const navigate = useNavigate();
+  const { hasPhysicalItems } = useCart();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardHolder: '',
     expiryDate: '',
     cvv: '',
-    email: ''
+    email: '',
+    // Address fields
+    fullName: '',
+    address: '',
+    address2: '',
+    city: '',
+    state: '',
+    country: '',
+    postalCode: '',
+    phoneNumber: ''
   });
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState('summary'); // 'summary', 'payment'
+  // Change step to be 'summary', 'address', or 'payment'
+  const [step, setStep] = useState('summary');
+  
+  // Check if there are any physical items (Gaming Accessories) in the cart
+  const needsShipping = hasPhysicalItems();
+
+  // Log for debugging
+  useEffect(() => {
+    console.log("Cart items:", cardDetails.items);
+    console.log("Needs shipping:", needsShipping);
+    console.log("Current step:", step);
+  }, [cardDetails.items, needsShipping, step]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +46,28 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
   };
 
   const handleContinue = () => {
+    console.log("Continue clicked, needs shipping:", needsShipping);
+    // If there are physical items, go to address step first, otherwise go to payment
+    if (needsShipping) {
+      console.log("Setting step to address");
+      setStep('address');
+    } else {
+      console.log("Setting step to payment");
+      setStep('payment');
+    }
+  };
+
+  const handleAddressSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validate address fields
+    if (!formData.fullName || !formData.address || !formData.city || !formData.country || !formData.postalCode || !formData.phoneNumber) {
+      alert('Please fill in all required address fields.');
+      return;
+    }
+    
+    // Proceed to payment step
+    console.log("Address submitted, proceeding to payment");
     setStep('payment');
   };
 
@@ -31,6 +75,35 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Here you would normally send the payment and shipping details to your backend
+      console.log("Processing payment with data:", {
+        payment: {
+          method: paymentMethod,
+          cardDetails: paymentMethod === 'card' ? {
+            cardNumber: formData.cardNumber,
+            cardHolder: formData.cardHolder,
+            expiryDate: formData.expiryDate,
+            cvv: formData.cvv
+          } : {
+            email: formData.email
+          }
+        },
+        shipping: needsShipping ? {
+          fullName: formData.fullName,
+          address: formData.address,
+          address2: formData.address2,
+          city: formData.city,
+          state: formData.state,
+          country: formData.country,
+          postalCode: formData.postalCode,
+          phoneNumber: formData.phoneNumber
+        } : null,
+        order: {
+          items: cardDetails.items,
+          total: amount + (needsShipping ? 5 : 0)
+        }
+      });
+      
       await new Promise(resolve => setTimeout(resolve, 2000));
       alert('Payment successful! Your order has been processed.');
       onClose();
@@ -42,13 +115,23 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
     }
   };
 
+  // Get the current step title
+  const getStepTitle = () => {
+    switch(step) {
+      case 'summary': return 'Order Summary';
+      case 'address': return 'Shipping Address';
+      case 'payment': return 'Secure Checkout';
+      default: return 'Checkout';
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className="bg-gradient-to-br from-[#1e1e2f] to-[#2c2c3e] rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-[#FFF7D1]">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
-            {step === 'summary' ? 'Order Summary' : 'Secure Checkout'}
+            {getStepTitle()}
           </h2>
           <button
             onClick={onClose}
@@ -56,6 +139,13 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
           >
             ×
           </button>
+        </div>
+
+        {/* Progress indicator */}
+        <div className="flex items-center mb-6">
+          <div className={`h-2 flex-1 rounded-l-full ${step === 'summary' ? 'bg-[#8B5DFF]' : 'bg-[#8B5DFF]'}`}></div>
+          <div className={`h-2 flex-1 ${step === 'address' || step === 'payment' ? 'bg-[#8B5DFF]' : 'bg-gray-700'}`}></div>
+          <div className={`h-2 flex-1 rounded-r-full ${step === 'payment' ? 'bg-[#8B5DFF]' : 'bg-gray-700'}`}></div>
         </div>
 
         {step === 'summary' ? (
@@ -86,6 +176,9 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                       <div>
                         <p className="text-sm font-medium">{item.title}</p>
                         <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+                        {item.isPhysical && (
+                          <span className="text-xs bg-purple-900 text-purple-200 px-1 py-0.5 rounded">Physical</span>
+                        )}
                       </div>
                     </div>
                     <p className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</p>
@@ -100,7 +193,7 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Shipping:</span>
-                  <span>$0.00</span>
+                  <span>{needsShipping ? '$5.00' : '$0.00'}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Tax:</span>
@@ -108,29 +201,187 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                 </div>
                 <div className="flex justify-between font-semibold text-lg mt-4">
                   <span>Total:</span>
-                  <span>${amount.toFixed(2)}</span>
+                  <span>${(amount + (needsShipping ? 5 : 0)).toFixed(2)}</span>
                 </div>
               </div>
+              
+              {needsShipping && (
+                <div className="mt-4 p-3 bg-[#2c2c3e] rounded-lg border border-purple-700">
+                  <div className="flex items-center text-purple-300 mb-2">
+                    <FaMapMarkerAlt className="mr-2" />
+                    <span className="font-semibold">Shipping Required</span>
+                  </div>
+                  <p className="text-sm text-gray-300">
+                    Your order contains physical items that require shipping.
+                    You'll need to provide a delivery address in the next step.
+                  </p>
+                </div>
+              )}
             </div>
 
             <button
               onClick={handleContinue}
-              className="w-full py-3 rounded-lg bg-[#8B5DFF] hover:bg-[#6A42C2] text-white font-semibold transition-all duration-300"
+              className="w-full py-3 rounded-lg bg-[#8B5DFF] hover:bg-[#6A42C2] text-white font-semibold transition-all duration-300 flex items-center justify-center"
             >
-              Continue to Payment
+              Continue to {needsShipping ? 'Shipping' : 'Payment'} 
+              <FaArrowRight className="ml-2" />
             </button>
+          </>
+        ) : step === 'address' ? (
+          <>
+            {/* Address Form */}
+            <form onSubmit={handleAddressSubmit} className="mb-6">
+              <div className="mb-4">
+                <label className="block text-sm mb-1">Full Name*</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                  required
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm mb-1">Phone Number*</label>
+                <div className="flex items-center">
+                  <span className="bg-[#3c3c4e] p-2 rounded-l-lg border-l border-y border-purple-700">
+                    <FaPhone className="text-purple-400" />
+                  </span>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    placeholder="+1 (555) 123-4567"
+                    className="w-full px-4 py-2 bg-[#2c2c3e] border-r border-y border-purple-700 rounded-r-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                    required
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm mb-1">Address Line 1*</label>
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="123 Main St"
+                  className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                  required
+                  value={formData.address}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm mb-1">Address Line 2 (Optional)</label>
+                <input
+                  type="text"
+                  name="address2"
+                  placeholder="Apt 4B, Floor 2, etc."
+                  className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                  value={formData.address2}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm mb-1">City*</label>
+                  <input
+                    type="text"
+                    name="city"
+                    placeholder="City"
+                    className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                    required
+                    value={formData.city}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1">State/Province</label>
+                  <input
+                    type="text"
+                    name="state"
+                    placeholder="State/Province"
+                    className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm mb-1">Country*</label>
+                  <input
+                    type="text"
+                    name="country"
+                    placeholder="Country"
+                    className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                    required
+                    value={formData.country}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1">Postal Code*</label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    placeholder="12345"
+                    className="w-full px-4 py-2 bg-[#2c2c3e] border border-purple-700 rounded-lg focus:ring-2 focus:ring-[#8B5DFF] text-white"
+                    required
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-4 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setStep('summary')}
+                  className="flex-1 py-3 rounded-lg border border-purple-700 text-white font-semibold"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 rounded-lg bg-[#8B5DFF] hover:bg-[#6A42C2] text-white font-semibold transition-all duration-300 flex items-center justify-center"
+                >
+                  Continue to Payment
+                  <FaArrowRight className="ml-2" />
+                </button>
+              </div>
+            </form>
           </>
         ) : (
           <>
             {/* Payment form */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-lg font-semibold">Total: ${amount.toFixed(2)}</p>
+                <p className="text-lg font-semibold">Total: ${(amount + (needsShipping ? 5 : 0)).toFixed(2)}</p>
                 <div className="flex items-center text-green-400 text-sm">
                   <FaLock className="mr-1" />
                   Secure Payment
                 </div>
               </div>
+
+              {needsShipping && (
+                <div className="p-3 bg-[#2c2c3e] rounded-lg border border-purple-700 mb-4">
+                  <p className="text-sm text-gray-300">
+                    <span className="font-semibold">Shipping to:</span><br />
+                    {formData.fullName}<br />
+                    {formData.address}{formData.address2 ? `, ${formData.address2}` : ''}<br />
+                    {formData.city}, {formData.state} {formData.postalCode}<br />
+                    {formData.country}<br />
+                    {formData.phoneNumber}
+                  </p>
+                </div>
+              )}
 
               <div className="flex gap-4 mb-6">
                 <button
@@ -235,7 +486,7 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
               <div className="flex space-x-4">
                 <button
                   type="button"
-                  onClick={() => setStep('summary')}
+                  onClick={() => setStep(needsShipping ? 'address' : 'summary')}
                   className="flex-1 py-3 rounded-lg border border-purple-700 text-white font-semibold"
                 >
                   Back
@@ -265,3 +516,4 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
 };
 
 export default PaymentGateway;
+

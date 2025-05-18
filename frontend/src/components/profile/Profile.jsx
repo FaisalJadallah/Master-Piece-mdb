@@ -13,13 +13,28 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [passwordMode, setPasswordMode] = useState(false);
+  const [error, setError] = useState(null);
   
   // Fetch user data
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
+        
+        // Check if token exists
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error("No authentication token found in localStorage");
+          setError("You are not logged in. Please log in to view your profile.");
+          setLoading(false);
+          return;
+        }
+        
+        console.log("Attempting to fetch user profile with token:", token.substring(0, 10) + "...");
+        
         const response = await getCurrentUserProfile();
+        console.log("Profile API response:", response);
+        
         const userData = response.data;
         
         setUsername(userData.username || "");
@@ -30,8 +45,32 @@ const Profile = () => {
         }
         
         setLoading(false);
+        setError(null);
       } catch (error) {
         console.error("Error fetching profile:", error);
+        
+        // More detailed error logging
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          console.error("Response headers:", error.response.headers);
+          
+          if (error.response.status === 401) {
+            setError("Authentication error. Please log in again.");
+          } else {
+            setError(`Server error: ${error.response.data.message || error.response.status}`);
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("No response received:", error.request);
+          setError("No response from server. Please check your connection.");
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error("Error setting up request:", error.message);
+          setError(`Error: ${error.message}`);
+        }
         
         // Show error toast
         Swal.fire({
@@ -39,7 +78,7 @@ const Profile = () => {
           position: 'top-end',
           icon: 'error',
           title: 'Failed to load profile',
-          text: 'Please try again later',
+          text: error.response?.data?.message || 'Please try again later',
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: true,
@@ -248,10 +287,27 @@ const Profile = () => {
     }
   };
 
-  if (loading && !username) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex justify-center items-center">
         <div className="text-white text-xl">Loading profile...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex justify-center items-center">
+        <div className="bg-[#563A9C] rounded-xl shadow-lg p-8 w-full max-w-md text-center">
+          <div className="text-[#FFF7D1] text-xl mb-4">Error</div>
+          <div className="text-white mb-6">{error}</div>
+          <button 
+            onClick={() => window.location.href = '/login'} 
+            className="bg-[#8B5DFF] hover:bg-[#6A42C2] text-white py-2 px-4 rounded-full transition duration-300"
+          >
+            Go to Login
+          </button>
+        </div>
       </div>
     );
   }

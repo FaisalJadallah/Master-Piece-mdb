@@ -55,7 +55,8 @@ const AccessoriesProducts = () => {
       id: product._id,
       title: product.title,
       price: product.price,
-      image: product.imageUrl
+      image: product.imageUrl,
+      isPhysical: true // Explicitly mark accessories as physical items
     });
     
     // Set the added state for this specific product

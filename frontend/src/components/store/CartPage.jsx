@@ -11,6 +11,7 @@ const CartPage = () => {
     updateQuantity,
     getCartTotal,
     clearCart,
+    hasPhysicalItems,
   } = useCart();
 
   const [showPayment, setShowPayment] = React.useState(false);
@@ -70,6 +71,9 @@ const CartPage = () => {
                       <div>
                         <h3 className="font-semibold text-[#FFF7D1]">{item.title}</h3>
                         <p className="text-sm text-purple-300">${item.price.toFixed(2)}</p>
+                        {item.isPhysical && (
+                          <span className="text-xs bg-purple-900 text-purple-200 px-1 py-0.5 rounded">Physical</span>
+                        )}
                       </div>
                     </div>
 
@@ -105,6 +109,13 @@ const CartPage = () => {
                   <span>Total:</span>
                   <span>${getCartTotal().toFixed(2)}</span>
                 </div>
+                {hasPhysicalItems() && (
+                  <div className="mb-4 p-3 bg-[#2f2b44] rounded-lg border border-purple-700">
+                    <p className="text-sm text-purple-200">
+                      <span className="font-semibold">Note:</span> Your cart contains physical items that require shipping. You'll need to provide a shipping address during checkout.
+                    </p>
+                  </div>
+                )}
                 <div className="flex space-x-4">
                   <Link
                     to="/store"
