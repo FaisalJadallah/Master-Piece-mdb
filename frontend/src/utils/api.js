@@ -123,6 +123,10 @@ export const getTournamentParticipants = (id) => {
 };
 
 // News APIs
+export const getLatestNews = (limit = 3) => {
+  return api.get(`/news/latest/${limit}`);
+};
+
 export const getAllNews = () => {
   return api.get('/news');
 };

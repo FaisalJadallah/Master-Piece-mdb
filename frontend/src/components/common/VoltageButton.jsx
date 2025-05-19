@@ -12,7 +12,7 @@ const VoltageButton = ({ children, to, onClick, className = '' }) => {
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 234.6 61.3" preserveAspectRatio="none" xmlSpace="preserve">
         <filter id="glow">
           <feGaussianBlur className="blur" result="coloredBlur" stdDeviation={2} />
-          <feTurbulence type="fractalNoise" baseFrequency="0.075" numOctaves="0.3" result="turbulence" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.075" numOctaves={1} result="turbulence" />
           <feDisplacementMap in="SourceGraphic" in2="turbulence" scale={30} xChannelSelector="R" yChannelSelector="G" result="displace" />
           <feMerge>
             <feMergeNode in="coloredBlur" />

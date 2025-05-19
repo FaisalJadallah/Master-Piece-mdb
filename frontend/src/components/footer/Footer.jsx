@@ -60,39 +60,47 @@ const Footer = () => {
   );
 
   return (
-    <footer className="bg-[#563A9C] text-[#FFF7D1]">
+    <footer className="bg-[#1F1633] text-[#FFF7D1] relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#563A9C] via-[#8A4FFF] to-[#563A9C]"></div>
+      <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-[#8A4FFF]/10 blur-xl"></div>
+      <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-[#8A4FFF]/10 blur-xl"></div>
+      
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto pt-16 pb-12 px-6">
+      <div className="max-w-7xl mx-auto pt-16 pb-12 px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           
           {/* Column 1: About */}
           <div>
             <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-[#FFF7D1] text-[#563A9C] flex items-center justify-center rounded-lg mr-3">
+              <div className="w-10 h-10 bg-[#8A4FFF] text-[#FFF7D1] flex items-center justify-center rounded-lg mr-3">
                 <span className="font-bold text-xl">G</span>
               </div>
-              <h2 className="text-2xl font-bold">GamingHive</h2>
+              <h2 className="text-2xl font-bold">
+                <span className="text-white">Gaming</span>
+                <span className="text-[#FFCC00]">Hive</span>
+              </h2>
             </div>
             <p className="text-sm text-[#FFF7D1]/80 mb-6">
               Your ultimate destination for games, gift cards, and competitive tournaments. Join our community of passionate gamers today!
             </p>
-            <div className="flex gap-4 text-[#FFF7D1]">
-              <a href="#facebook" className="hover:text-white transition-colors">
+            <div className="flex gap-4 text-[#8A4FFF]">
+              <a href="#facebook" className="hover:text-[#FFCC00] transition-colors">
                 <FacebookIcon />
               </a>
-              <a href="#twitter" className="hover:text-white transition-colors">
+              <a href="#twitter" className="hover:text-[#FFCC00] transition-colors">
                 <TwitterIcon />
               </a>
-              <a href="#instagram" className="hover:text-white transition-colors">
+              <a href="#instagram" className="hover:text-[#FFCC00] transition-colors">
                 <InstagramIcon />
               </a>
-              <a href="#discord" className="hover:text-white transition-colors">
+              <a href="#discord" className="hover:text-[#FFCC00] transition-colors">
                 <DiscordIcon />
               </a>
-              <a href="#twitch" className="hover:text-white transition-colors">
+              <a href="#twitch" className="hover:text-[#FFCC00] transition-colors">
                 <TwitchIcon />
               </a>
-              <a href="#youtube" className="hover:text-white transition-colors">
+              <a href="#youtube" className="hover:text-[#FFCC00] transition-colors">
                 <YoutubeIcon />
               </a>
             </div>
@@ -100,36 +108,36 @@ const Footer = () => {
           
           {/* Column 2: Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 border-b border-[#FFF7D1]/20 pb-2">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-6 border-b border-[#8A4FFF]/30 pb-2">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <a href="/" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Home
+                <a href="/" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Home
                 </a>
               </li>
               <li>
-                <a href="/store" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Store
+                <a href="/tournaments" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Tournaments
                 </a>
               </li>
               <li>
-                <a href="/tournaments" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Tournaments
+                <a href="/store" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Store
                 </a>
               </li>
               <li>
-                <a href="/profile" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Profile
+                <a href="/news" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>News
                 </a>
               </li>
               <li>
-                <a href="/blog" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Blog
+                <a href="/about" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>About Us
                 </a>
               </li>
               <li>
-                <a href="/about" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>About Us
+                <a href="/profile" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Profile
                 </a>
               </li>
             </ul>
@@ -137,81 +145,72 @@ const Footer = () => {
           
           {/* Column 3: Products */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 border-b border-[#FFF7D1]/20 pb-2">Products</h3>
+            <h3 className="text-lg font-semibold mb-6 border-b border-[#8A4FFF]/30 pb-2">Gift Cards</h3>
             <ul className="space-y-3">
               <li>
-                <a href="/store/gift-cards/playstation" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>PlayStation Cards
+                <a href="/store/gift-cards/playstation" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>PlayStation Cards
                 </a>
               </li>
               <li>
-                <a href="/store/gift-cards/xbox" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Xbox Cards
+                <a href="/store/gift-cards/xbox" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Xbox Cards
                 </a>
               </li>
               <li>
-                <a href="/store/gift-cards/steam" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Steam Cards
+                <a href="/store/gift-cards/steam" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Steam Cards
                 </a>
               </li>
               <li>
-                <a href="/store/gift-cards/nintendo" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Nintendo Cards
+                <a href="/store/gift-cards/nintendo" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Nintendo Cards
                 </a>
               </li>
               <li>
-                <a href="/store/merchandise" className="hover:text-white transition-colors flex items-center">
-                  <span className="w-1.5 h-1.5 bg-[#FFF7D1]/60 rounded-full mr-2"></span>Merchandise
+                <a href="/store/merchandise" className="hover:text-[#FFCC00] transition-colors flex items-center text-[#FFF7D1]/90">
+                  <span className="w-1.5 h-1.5 bg-[#8A4FFF] rounded-full mr-2"></span>Merchandise
                 </a>
               </li>
             </ul>
           </div>
           
           {/* Column 4: Contact */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6 border-b border-[#FFF7D1]/20 pb-2">Contact Us</h3>
+          <div className="relative">
+            <h3 className="text-lg font-semibold mb-6 border-b border-[#8A4FFF]/30 pb-2">Contact Us</h3>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <span className="mt-1 mr-3 text-[#FFF7D1]/70"><MapIcon /></span>
-                <span>123 Gamer Street, Digital City, GA 30033</span>
+                <span className="mt-1 mr-3 text-[#8A4FFF]"><MapIcon /></span>
+                <span className="text-[#FFF7D1]/90">123 Gamer Street, Digital City, GA 30033</span>
               </li>
               <li className="flex items-center">
-                <span className="mr-3 text-[#FFF7D1]/70"><EmailIcon /></span>
-                <a href="mailto:info@gaminghive.com" className="hover:text-white transition-colors">info@gaminghive.com</a>
+                <span className="mr-3 text-[#8A4FFF]"><EmailIcon /></span>
+                <a href="mailto:info@gaminghive.com" className="hover:text-[#FFCC00] transition-colors text-[#FFF7D1]/90">info@gaminghive.com</a>
               </li>
               <li className="flex items-center">
-                <span className="mr-3 text-[#FFF7D1]/70"><HeadsetIcon /></span>
-                <a href="tel:+11234567890" className="hover:text-white transition-colors">+1 (123) 456-7890</a>
+                <span className="mr-3 text-[#8A4FFF]"><HeadsetIcon /></span>
+                <a href="tel:+11234567890" className="hover:text-[#FFCC00] transition-colors text-[#FFF7D1]/90">+1 (123) 456-7890</a>
               </li>
             </ul>
             
-            <div className="mt-6">
-              <h4 className="font-medium mb-3">Subscribe to Newsletter</h4>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="bg-[#FFF7D1]/10 text-white px-4 py-2 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#FFF7D1]/50"
-                />
-                <button className="bg-[#FFF7D1] text-[#563A9C] px-4 py-2 rounded-r-md font-medium hover:bg-white transition-colors">
-                  Send
-                </button>
-              </div>
-            </div>
+           
           </div>
         </div>
+        
+     
       </div>
       
       {/* Bottom Bar */}
-      <div className="border-t border-[#FFF7D1]/10">
+      <div className="border-t border-[#8A4FFF]/20 bg-[#17111F]">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-sm text-[#FFF7D1]/70 mb-4 md:mb-0">
-            © {currentYear} GamingHive. All rights reserved.
+          <div className="text-sm text-[#FFF7D1]/60 mb-4 md:mb-0">
+            © {currentYear} <span className="text-[#FFCC00]">GamingHive</span>. All rights reserved.
           </div>
-          <div className="flex gap-6 text-sm text-[#FFF7D1]/70">
-            <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="/faq" className="hover:text-white transition-colors">FAQ</a>
+          <div className="flex gap-6 text-sm text-[#FFF7D1]/60">
+            <a href="/privacy-policy" className="hover:text-[#FFCC00] transition-colors">Privacy Policy</a>
+            <a href="/terms-of-service" className="hover:text-[#FFCC00] transition-colors">Terms of Service</a>
+            <a href="/faq" className="hover:text-[#FFCC00] transition-colors">FAQ</a>
+            <a href="/support" className="hover:text-[#FFCC00] transition-colors">Support</a>
           </div>
         </div>
       </div>

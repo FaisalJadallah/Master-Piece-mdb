@@ -1,5 +1,20 @@
 const News = require('../models/News');
 
+// Get latest news articles
+exports.getLatestNews = async (req, res) => {
+  try {
+    const limit = parseInt(req.params.limit) || 3;
+    const news = await News.find({ isPublished: true })
+      .sort({ createdAt: -1 })
+      .limit(limit);
+    
+    res.status(200).json(news);
+  } catch (error) {
+    console.error('Error fetching latest news:', error);
+    res.status(500).json({ message: 'Failed to fetch latest news', error: error.message });
+  }
+};
+
 // Get all news articles
 exports.getAllNews = async (req, res) => {
   try {

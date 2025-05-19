@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowLeft, FaEdit, FaTrash, FaUserAlt, FaUserShield, FaLock, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaArrowLeft, FaEdit, FaTrash, FaUserAlt, FaUserShield, FaLock, FaChevronLeft, FaChevronRight, FaUsers } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { getAllUsers, updateUserRole as apiUpdateUserRole, deleteUser as apiDeleteUser } from '../../utils/api';
 
@@ -115,70 +115,98 @@ const UserManagement = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-gray-400 hover:text-white">
-              <FaArrowLeft />
-            </Link>
-            <h1 className="text-3xl font-bold text-[#FFF7D1]">User Management</h1>
+    <div className="min-h-screen bg-black text-white">
+      {/* Header with gradient background */}
+      <div className="relative bg-gradient-to-br from-gray-900 via-yellow-900/10 to-black py-8 px-6">
+        <div className="absolute inset-0 bg-[url('/src/assets/Home/hex-pattern.png')] bg-repeat opacity-10"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex items-center gap-4">
+              <Link to="/admin" className="text-gray-400 hover:text-yellow-500 transition-colors">
+                <FaArrowLeft />
+              </Link>
+              <div className="flex items-center">
+                <FaUsers className="text-yellow-500 text-2xl mr-3" />
+                <h1 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
+                  User Management
+                </h1>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {error && (
-          <div className="bg-red-600 text-white p-3 rounded-md mb-6">
+          <div className="bg-red-900/50 border border-red-500 text-white p-4 rounded-xl mb-6 flex items-center">
+            <div className="bg-red-500/20 p-2 rounded-full mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
             {error}
           </div>
         )}
 
         {users.length === 0 ? (
-          <div className="bg-gray-800 rounded-lg p-8 text-center">
-            <p className="text-xl text-gray-400">No users found</p>
+          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-12 text-center shadow-xl">
+            <div className="bg-gray-800/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+              <FaUsers className="text-yellow-500 text-3xl" />
+            </div>
+            <p className="text-xl text-white mb-2">No users found</p>
+            <p className="text-gray-400">
+              There are no users registered in the system yet.
+            </p>
           </div>
         ) : (
-          <>
+          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl overflow-hidden shadow-xl">
             <div className="overflow-x-auto">
-              <table className="w-full bg-gray-800 rounded-lg overflow-hidden">
-                <thead className="bg-gray-700">
+              <table className="w-full">
+                <thead className="bg-gray-800/80">
                   <tr>
-                    <th className="p-3 text-left">Username</th>
-                    <th className="p-3 text-left">Email</th>
-                    <th className="p-3 text-left">Role</th>
-                    <th className="p-3 text-left">Joined</th>
-                    <th className="p-3 text-center">Actions</th>
+                    <th className="p-4 text-left text-gray-300 font-medium">Username</th>
+                    <th className="p-4 text-left text-gray-300 font-medium">Email</th>
+                    <th className="p-4 text-left text-gray-300 font-medium">Role</th>
+                    <th className="p-4 text-left text-gray-300 font-medium">Joined</th>
+                    <th className="p-4 text-center text-gray-300 font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentUsers.map((user) => (
-                    <tr key={user._id} className="border-t border-gray-700 hover:bg-gray-750">
-                      <td className="p-3 flex items-center gap-2">
-                        <FaUserAlt className="text-gray-400" />
-                        {user.username}
+                  {currentUsers.map((user, index) => (
+                    <tr key={user._id} className={`border-t border-gray-800 hover:bg-gray-800/50 transition-colors ${index % 2 === 0 ? 'bg-gray-900/30' : ''}`}>
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                            <FaUserAlt className={`${user.role === 'admin' ? 'text-yellow-500' : 'text-gray-400'}`} />
+                          </div>
+                          <span className="font-medium text-white">{user.username}</span>
+                        </div>
                       </td>
-                      <td className="p-3">{user.email}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          user.role === 'admin' ? 'bg-red-900 text-red-200' : 'bg-blue-900 text-blue-200'
+                      <td className="p-4 text-gray-300">{user.email}</td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          user.role === 'admin' 
+                            ? 'bg-yellow-900/50 text-yellow-200 border border-yellow-700' 
+                            : 'bg-gray-800 text-gray-300 border border-gray-700'
                         }`}>
                           {user.role}
                         </span>
                       </td>
-                      <td className="p-3">
+                      <td className="p-4 text-gray-300">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
-                      <td className="p-3">
-                        <div className="flex justify-center gap-2">
+                      <td className="p-4">
+                        <div className="flex justify-center gap-3">
                           <button
                             onClick={() => openRoleModal(user)}
-                            className="p-2 text-blue-400 hover:text-blue-300"
+                            className="p-2 bg-gray-800 hover:bg-gray-700 text-yellow-500 hover:text-yellow-400 rounded-lg transition-colors"
                             title="Change Role"
                           >
                             <FaUserShield />
@@ -186,7 +214,9 @@ const UserManagement = () => {
                           <button
                             onClick={() => confirmDeleteUser(user)}
                             disabled={user.role === 'admin'}
-                            className={user.role === 'admin' ? 'p-2 text-gray-500 cursor-not-allowed' : 'p-2 text-red-400 hover:text-red-300'}
+                            className={user.role === 'admin' 
+                              ? 'p-2 bg-gray-800 text-gray-500 cursor-not-allowed rounded-lg' 
+                              : 'p-2 bg-gray-800 hover:bg-gray-700 text-red-500 hover:text-red-400 rounded-lg transition-colors'}
                             title={user.role === 'admin' ? 'Cannot delete admin users' : 'Delete User'}
                           >
                             <FaTrash />
@@ -201,7 +231,7 @@ const UserManagement = () => {
             
             {/* Pagination Controls */}
             {users.length > usersPerPage && (
-              <div className="mt-6 flex justify-between items-center">
+              <div className="px-4 py-5 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-sm text-gray-400">
                   Showing {indexOfFirstUser + 1}-{Math.min(indexOfLastUser, users.length)} of {users.length} users
                 </div>
@@ -211,8 +241,8 @@ const UserManagement = () => {
                     disabled={currentPage === 1}
                     className={`p-2 rounded-md ${
                       currentPage === 1 
-                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
-                        : 'bg-purple-700 hover:bg-purple-600 text-white'
+                        ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
+                        : 'bg-gray-800 hover:bg-gray-700 text-yellow-500 hover:text-yellow-400'
                     }`}
                   >
                     <FaChevronLeft size={14} />
@@ -226,8 +256,8 @@ const UserManagement = () => {
                         onClick={() => paginate(number)}
                         className={`w-8 h-8 rounded-md ${
                           currentPage === number
-                            ? 'bg-purple-600 text-white font-bold'
-                            : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                            ? 'bg-yellow-600 text-black font-bold'
+                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
                         }`}
                       >
                         {number}
@@ -240,8 +270,8 @@ const UserManagement = () => {
                     disabled={currentPage === totalPages}
                     className={`p-2 rounded-md ${
                       currentPage === totalPages 
-                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
-                        : 'bg-purple-700 hover:bg-purple-600 text-white'
+                        ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
+                        : 'bg-gray-800 hover:bg-gray-700 text-yellow-500 hover:text-yellow-400'
                     }`}
                   >
                     <FaChevronRight size={14} />
@@ -249,29 +279,29 @@ const UserManagement = () => {
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
       {/* Delete Confirmation Modal */}
       {showConfirmModal && userToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold text-[#FFF7D1] mb-4">Confirm Deletion</h2>
-            <p className="mb-6">
-              Are you sure you want to delete user <span className="font-bold">{userToDelete.username}</span>?
+        <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600 mb-4">Confirm Deletion</h2>
+            <p className="mb-6 text-gray-300">
+              Are you sure you want to delete user <span className="font-bold text-white">{userToDelete.username}</span>?
               This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md"
+                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={deleteUser}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md"
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors"
               >
                 Delete
               </button>
@@ -282,36 +312,40 @@ const UserManagement = () => {
 
       {/* Role Update Modal */}
       {showRoleModal && userToUpdate && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold text-[#FFF7D1] mb-4">Change User Role</h2>
-            <p className="mb-4">
-              Change role for <span className="font-bold">{userToUpdate.username}</span>
+        <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600 mb-4">Change User Role</h2>
+            <p className="mb-6 text-gray-300">
+              Change role for <span className="font-bold text-white">{userToUpdate.username}</span>
             </p>
             
             <div className="grid grid-cols-2 gap-4 mb-6">
               <button
                 onClick={() => updateUserRole('user')}
-                className={`p-3 rounded-lg flex items-center justify-center gap-2 ${
-                  userToUpdate.role === 'user' ? 'bg-blue-700 border-2 border-blue-500' : 'bg-blue-600 hover:bg-blue-700'
+                className={`p-4 rounded-lg flex items-center justify-center gap-2 transition-all ${
+                  userToUpdate.role === 'user' 
+                    ? 'bg-gray-800 border-2 border-gray-600 text-white' 
+                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white'
                 }`}
               >
-                <FaUserAlt /> User
+                <FaUserAlt className={userToUpdate.role === 'user' ? 'text-gray-300' : ''} /> User
               </button>
               <button
                 onClick={() => updateUserRole('admin')}
-                className={`p-3 rounded-lg flex items-center justify-center gap-2 ${
-                  userToUpdate.role === 'admin' ? 'bg-red-700 border-2 border-red-500' : 'bg-red-600 hover:bg-red-700'
+                className={`p-4 rounded-lg flex items-center justify-center gap-2 transition-all ${
+                  userToUpdate.role === 'admin' 
+                    ? 'bg-yellow-600 border-2 border-yellow-500 text-black' 
+                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white'
                 }`}
               >
-                <FaUserShield /> Admin
+                <FaUserShield className={userToUpdate.role === 'admin' ? 'text-black' : ''} /> Admin
               </button>
             </div>
             
             <div className="flex justify-end">
               <button
                 onClick={() => setShowRoleModal(false)}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md"
+                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
               >
                 Cancel
               </button>

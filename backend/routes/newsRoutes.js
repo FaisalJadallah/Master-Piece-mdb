@@ -5,6 +5,7 @@ const authMiddleware = require('../middleares/authMiddleware');
 const adminMiddleware = require('../middleares/adminMiddleware');
 
 // Public routes
+router.get('/latest/:limit', newsController.getLatestNews);
 router.get('/', newsController.getAllNews);
 router.get('/:id', newsController.getNewsById);
 

@@ -1,7 +1,7 @@
 // src/pages/AdminDashboard.jsx
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaTrophy, FaUsers, FaStore, FaChartBar, FaNewspaper, FaSignOutAlt } from "react-icons/fa";
+import { FaTrophy, FaUsers, FaStore, FaChartBar, FaNewspaper, FaSignOutAlt, FaShieldAlt } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -14,107 +14,109 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-[#FFF7D1]">Admin Dashboard</h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-          >
-            <FaSignOutAlt /> Logout
-          </button>
+    <div className="min-h-screen bg-black text-white">
+      {/* Header with gradient background */}
+      <div className="relative bg-gradient-to-br from-gray-900 via-yellow-900/10 to-black py-12 px-6">
+        <div className="absolute inset-0 bg-[url('/src/assets/Home/hex-pattern.png')] bg-repeat opacity-10"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <FaShieldAlt className="text-yellow-500 text-3xl mr-3" />
+              <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">
+                Admin Dashboard
+              </h1>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg transition-all shadow-lg"
+            >
+              <FaSignOutAlt /> Logout
+            </button>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Tournaments Card */}
-          <Link to="/admin/tournaments" className="block">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-750 transition-colors duration-200">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Tournaments</h2>
-                <FaTrophy className="text-[#8B5DFF] text-2xl" />
+          <Link to="/admin/tournaments" className="block group">
+            <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl shadow-xl hover:shadow-yellow-500/10 transition-all duration-300 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Tournaments</h2>
+                <div className="p-3 bg-gray-800 rounded-full group-hover:bg-yellow-500/20 transition-colors">
+                  <FaTrophy className="text-yellow-500 text-2xl" />
+                </div>
               </div>
-              <p className="text-gray-400 mb-4">Manage gaming tournaments</p>
-              <div className="bg-[#8B5DFF] py-2 px-4 rounded-md text-center text-white">
-                Manage
+              <p className="text-gray-400 mb-6">Manage gaming tournaments, participants, and schedules</p>
+              <div className="bg-yellow-500 hover:bg-yellow-400 py-3 px-4 rounded-lg text-center text-black font-bold transition-colors group-hover:shadow-md group-hover:shadow-yellow-500/20">
+                Manage Tournaments
               </div>
             </div>
           </Link>
           
           {/* Users Card */}
-          <Link to="/admin/users" className="block">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-750 transition-colors duration-200">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Users</h2>
-                <FaUsers className="text-blue-500 text-2xl" />
+          <Link to="/admin/users" className="block group">
+            <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl shadow-xl hover:shadow-yellow-500/10 transition-all duration-300 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Users</h2>
+                <div className="p-3 bg-gray-800 rounded-full group-hover:bg-yellow-500/20 transition-colors">
+                  <FaUsers className="text-yellow-500 text-2xl" />
+                </div>
               </div>
-              <p className="text-gray-400 mb-4">Manage user accounts</p>
-              <div className="bg-blue-600 py-2 px-4 rounded-md text-center text-white">
-                Manage
+              <p className="text-gray-400 mb-6">Manage user accounts, roles, and permissions</p>
+              <div className="bg-yellow-500 hover:bg-yellow-400 py-3 px-4 rounded-lg text-center text-black font-bold transition-colors group-hover:shadow-md group-hover:shadow-yellow-500/20">
+                Manage Users
               </div>
             </div>
           </Link>
           
           {/* Store Card */}
-          <Link to="/admin/store" className="block">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-750 transition-colors duration-200">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Store</h2>
-                <FaStore className="text-green-500 text-2xl" />
+          <Link to="/admin/store" className="block group">
+            <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl shadow-xl hover:shadow-yellow-500/10 transition-all duration-300 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Store</h2>
+                <div className="p-3 bg-gray-800 rounded-full group-hover:bg-yellow-500/20 transition-colors">
+                  <FaStore className="text-yellow-500 text-2xl" />
+                </div>
               </div>
-              <p className="text-gray-400 mb-4">Manage digital products</p>
-              <div className="bg-green-600 py-2 px-4 rounded-md text-center text-white">
-                Manage
+              <p className="text-gray-400 mb-6">Manage digital products, inventory, and orders</p>
+              <div className="bg-yellow-500 hover:bg-yellow-400 py-3 px-4 rounded-lg text-center text-black font-bold transition-colors group-hover:shadow-md group-hover:shadow-yellow-500/20">
+                Manage Store
               </div>
             </div>
           </Link>
           
           {/* News Card */}
-          <Link to="/admin/news" className="block">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-750 transition-colors duration-200">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">News</h2>
-                <FaNewspaper className="text-purple-500 text-2xl" />
+          <Link to="/admin/news" className="block group">
+            <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl shadow-xl hover:shadow-yellow-500/10 transition-all duration-300 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">News</h2>
+                <div className="p-3 bg-gray-800 rounded-full group-hover:bg-yellow-500/20 transition-colors">
+                  <FaNewspaper className="text-yellow-500 text-2xl" />
+                </div>
               </div>
-              <p className="text-gray-400 mb-4">Manage news articles</p>
-              <div className="bg-purple-600 py-2 px-4 rounded-md text-center text-white">
-                Manage
+              <p className="text-gray-400 mb-6">Manage news articles, blog posts, and announcements</p>
+              <div className="bg-yellow-500 hover:bg-yellow-400 py-3 px-4 rounded-lg text-center text-black font-bold transition-colors group-hover:shadow-md group-hover:shadow-yellow-500/20">
+                Manage News
               </div>
             </div>
           </Link>
           
           {/* Analytics Card */}
-          <Link to="/admin/analytics" className="block">
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-750 transition-colors duration-200">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Analytics</h2>
-                <FaChartBar className="text-yellow-500 text-2xl" />
+          <Link to="/admin/analytics" className="block group">
+            <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-6 rounded-xl shadow-xl hover:shadow-yellow-500/10 transition-all duration-300 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Analytics</h2>
+                <div className="p-3 bg-gray-800 rounded-full group-hover:bg-yellow-500/20 transition-colors">
+                  <FaChartBar className="text-yellow-500 text-2xl" />
+                </div>
               </div>
-              <p className="text-gray-400 mb-4">View site statistics</p>
-              <div className="bg-yellow-600 py-2 px-4 rounded-md text-center text-white">
-                View
+              <p className="text-gray-400 mb-6">View site statistics, user engagement, and sales data</p>
+              <div className="bg-yellow-500 hover:bg-yellow-400 py-3 px-4 rounded-lg text-center text-black font-bold transition-colors group-hover:shadow-md group-hover:shadow-yellow-500/20">
+                View Analytics
               </div>
             </div>
           </Link>
-        </div>
-        
-        {/* Quick Stats Section */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-4 text-[#FFF7D1]">Quick Stats</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <h3 className="text-gray-400 mb-2">Active Users</h3>
-              <p className="text-3xl font-bold">1,245</p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <h3 className="text-gray-400 mb-2">Upcoming Tournaments</h3>
-              <p className="text-3xl font-bold">7</p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <h3 className="text-gray-400 mb-2">Revenue (Month)</h3>
-              <p className="text-3xl font-bold">$12,840</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
