@@ -87,9 +87,23 @@ exports.registerParticipant = async (req, res) => {
       return res.status(400).json({ message: 'You are already registered for this tournament' });
     }
     
+    console.log('Registration request body:', req.body);
+    
+    // Convert userId to ObjectId if it exists and is valid
+    let userId = null;
+    if (req.body.userId && req.body.userId !== 'null' && req.body.userId !== 'undefined') {
+      const mongoose = require('mongoose');
+      try {
+        userId = mongoose.Types.ObjectId(req.body.userId);
+        console.log('Converted userId to ObjectId:', userId);
+      } catch (err) {
+        console.error('Invalid userId format:', req.body.userId);
+      }
+    }
+    
     // Add new participant
     tournament.participants.push({
-      userId: req.body.userId || null,
+      userId: userId,
       fullName: req.body.fullName,
       email: req.body.email,
       gamerTag: req.body.gamerTag || req.body.teamName,
@@ -107,6 +121,7 @@ exports.registerParticipant = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Tournament registration error:', error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -158,5 +173,45 @@ exports.updateParticipantStatus = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// Get all tournaments a user has participated in
+exports.getUserTournaments = async (req, res) => {
+  try {
+    console.log(`[TOURNAMENTS] Fetching tournaments for user ${req.user.userId}`);
+    
+    // Find all tournaments where the user is a participant
+    const tournaments = await Tournament.find({
+      'participants.userId': req.user.userId
+    }).sort({ dateTime: -1 });
+    
+    if (!tournaments || tournaments.length === 0) {
+      return res.status(200).json([]);
+    }
+    
+    // Format the response to include only relevant information
+    const userTournaments = tournaments.map(tournament => {
+      // Find the user's specific participation record
+      const userParticipation = tournament.participants.find(
+        p => p.userId && p.userId.toString() === req.user.userId
+      );
+      
+      return {
+        id: tournament._id,
+        name: tournament.gameName,
+        date: tournament.dateTime,
+        game: tournament.gameName,
+        status: tournament.status,
+        position: userParticipation ? userParticipation.status : 'unknown',
+        prize: tournament.prize,
+        gamerTag: userParticipation ? userParticipation.gamerTag : '',
+      };
+    });
+    
+    res.status(200).json(userTournaments);
+  } catch (error) {
+    console.error('[TOURNAMENTS] Error fetching user tournaments:', error);
+    res.status(500).json({ message: error.message });
   }
 }; 

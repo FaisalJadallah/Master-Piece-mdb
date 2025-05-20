@@ -122,6 +122,10 @@ export const getTournamentParticipants = (id) => {
   return api.get(`/tournaments/${id}/participants`);
 };
 
+export const getUserTournamentHistory = () => {
+  return api.get('/tournaments/user/history');
+};
+
 // News APIs
 export const getLatestNews = (limit = 3) => {
   return api.get(`/news/latest/${limit}`);
@@ -215,6 +219,27 @@ export const updateUserProfile = (formData) => {
       'Content-Type': 'multipart/form-data'
     }
   });
+};
+
+// Order APIs
+export const createOrder = (orderData) => {
+  return api.post('/orders', orderData);
+};
+
+export const getMyOrders = () => {
+  return api.get('/orders/myorders');
+};
+
+export const getOrderById = (id) => {
+  return api.get(`/orders/${id}`);
+};
+
+export const updateOrderToPaid = (id, paymentResult) => {
+  return api.put(`/orders/${id}/pay`, paymentResult);
+};
+
+export const getAllOrders = () => {
+  return api.get('/orders');
 };
 
 export default api; 

@@ -193,7 +193,7 @@ const TournamentDetails = () => {
                   <h3 className="text-xl font-semibold text-white">Ready to join?</h3>
                   <div className="flex items-center mt-2">
                     <FaMoneyBillWave className="text-yellow-500 mr-2" />
-                    <p className="text-3xl font-bold text-yellow-500">${registrationFee.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-yellow-500">{registrationFee.toFixed(2)} JOD</p>
                   </div>
                   <p className="text-gray-400 mt-1">Registration fee</p>
                 </div>

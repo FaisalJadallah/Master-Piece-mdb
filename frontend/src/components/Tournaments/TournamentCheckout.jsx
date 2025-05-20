@@ -17,8 +17,30 @@ const TournamentCheckout = () => {
     fullName: '',
     email: '',
     teamName: '',
+    // Payment fields
+    cardNumber: '',
+    cardHolder: '',
+    expiryDate: '',
+    cvv: '',
+  });
+  const [formErrors, setFormErrors] = useState({
+    fullName: '',
+    email: '',
+    teamName: '',
+    cardNumber: '',
+    cardHolder: '',
+    expiryDate: '',
+    cvv: '',
   });
   const [processingPayment, setProcessingPayment] = useState(false);
+
+  // Regex patterns for validation
+  const validationPatterns = {
+    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    cardNumber: /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})$/,
+    expiryDate: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
+    cvv: /^[0-9]{3,4}$/,
+  };
 
   useEffect(() => {
     const fetchTournament = async () => {
@@ -44,24 +66,108 @@ const TournamentCheckout = () => {
       ...prev,
       [name]: value
     }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateField = (name, value) => {
+    if (!value) return "This field is required";
+    
+    if (validationPatterns[name]) {
+      if (!validationPatterns[name].test(value)) {
+        switch (name) {
+          case 'email':
+            return "Please enter a valid email address";
+          case 'cardNumber':
+            return "Please enter a valid credit card number";
+          case 'expiryDate':
+            return "Use format MM/YY (e.g. 12/25)";
+          case 'cvv':
+            return "CVV must be 3 or 4 digits";
+          default:
+            return "Invalid format";
+        }
+      }
+    }
+    return "";
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    // Validate basic fields
+    ['fullName', 'email', 'teamName'].forEach(field => {
+      const error = validateField(field, formData[field]);
+      if (error) {
+        newErrors[field] = error;
+        isValid = false;
+      }
+    });
+
+    // Validate payment fields if card method is selected
+    if (paymentMethod === 'card') {
+      ['cardNumber', 'cardHolder', 'expiryDate', 'cvv'].forEach(field => {
+        const error = validateField(field, formData[field]);
+        if (error) {
+          newErrors[field] = error;
+          isValid = false;
+        }
+      });
+    }
+
+    setFormErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      // Show validation error toast
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'warning',
+        title: 'Form Validation Error',
+        text: 'Please check the form for errors',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: '#ff9800',
+        color: 'white',
+        iconColor: 'white'
+      });
+      return;
+    }
+    
     setProcessingPayment(true);
     
     try {
+      // Get the user ID from localStorage
+      const userId = localStorage.getItem('userId');
+      console.log('User ID from localStorage:', userId);
+      
       // Register the participant with the tournament
       const userData = {
         fullName: formData.fullName,
         email: formData.email,
         teamName: formData.teamName,
-        // Add user ID if user is logged in
-        userId: localStorage.getItem('userId') || null
+        // Make sure userId is properly passed
+        userId: userId
       };
+      
+      console.log('Sending registration data:', userData);
       
       // Call the registration API
       const response = await axios.post(`${API_URL}/tournaments/${id}/register`, userData);
+      console.log('Registration response:', response.data);
       
       // Show success message with Swal toast and redirect to tournament page
       setTimeout(() => {
@@ -165,9 +271,12 @@ const TournamentCheckout = () => {
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white"
+                      className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.fullName ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
                       required
                     />
+                    {formErrors.fullName && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>
+                    )}
                   </div>
                   
                   <div>
@@ -177,9 +286,12 @@ const TournamentCheckout = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white"
+                      className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.email ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
                       required
                     />
+                    {formErrors.email && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                    )}
                   </div>
                   
                   <div>
@@ -189,9 +301,12 @@ const TournamentCheckout = () => {
                       name="teamName"
                       value={formData.teamName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white"
+                      className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.teamName ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
                       required
                     />
+                    {formErrors.teamName && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.teamName}</p>
+                    )}
                   </div>
                   
                   <div className="mt-8">
@@ -228,6 +343,72 @@ const TournamentCheckout = () => {
                       </div>
                     </div>
                   </div>
+
+                  {paymentMethod === 'card' && (
+                    <div className="mt-6 space-y-4 bg-gray-900/50 p-4 rounded-lg border border-gray-800">
+                      <div>
+                        <label className="block text-gray-300 mb-2">Card Number</label>
+                        <input
+                          type="text"
+                          name="cardNumber"
+                          placeholder="1234 5678 9012 3456"
+                          value={formData.cardNumber}
+                          onChange={handleInputChange}
+                          className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.cardNumber ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
+                        />
+                        {formErrors.cardNumber && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.cardNumber}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <label className="block text-gray-300 mb-2">Cardholder Name</label>
+                        <input
+                          type="text"
+                          name="cardHolder"
+                          placeholder="John Doe"
+                          value={formData.cardHolder}
+                          onChange={handleInputChange}
+                          className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.cardHolder ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
+                        />
+                        {formErrors.cardHolder && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.cardHolder}</p>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-gray-300 mb-2">Expiry Date</label>
+                          <input
+                            type="text"
+                            name="expiryDate"
+                            placeholder="MM/YY"
+                            value={formData.expiryDate}
+                            onChange={handleInputChange}
+                            className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.expiryDate ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
+                          />
+                          {formErrors.expiryDate && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.expiryDate}</p>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <label className="block text-gray-300 mb-2">CVV</label>
+                          <input
+                            type="text"
+                            name="cvv"
+                            placeholder="123"
+                            value={formData.cvv}
+                            onChange={handleInputChange}
+                            className={`w-full px-3 py-2 bg-gray-800 border ${formErrors.cvv ? 'border-red-500' : 'border-gray-700'} rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-white`}
+                          />
+                          {formErrors.cvv && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.cvv}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-8">
@@ -282,7 +463,7 @@ const TournamentCheckout = () => {
               <div className="border-t border-gray-700 pt-4 mb-4">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Registration Fee:</span>
-                  <span className="text-yellow-500">${registrationFee.toFixed(2)}</span>
+                  <span className="text-yellow-500">{registrationFee.toFixed(2)} JOD</span>
                 </div>
               </div>
 

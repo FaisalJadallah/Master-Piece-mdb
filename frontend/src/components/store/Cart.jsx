@@ -71,7 +71,7 @@ const Cart = ({ isOpen, onClose }) => {
                     />
                     <div>
                       <h3 className="font-semibold text-[#FFF7D1]">{item.title}</h3>
-                      <p className="text-sm text-purple-300">${item.price.toFixed(2)}</p>
+                      <p className="text-sm text-purple-300">{item.price.toFixed(2)} JOD</p>
                       {item.isPhysical && (
                         <span className="text-xs bg-purple-900 text-purple-200 px-1 py-0.5 rounded">Physical</span>
                       )}
@@ -111,7 +111,7 @@ const Cart = ({ isOpen, onClose }) => {
             <div className="border-t border-purple-700 px-6 py-4">
               <div className="flex justify-between text-lg font-semibold mb-4">
                 <span>Total:</span>
-                <span>${getCartTotal().toFixed(2)}</span>
+                <span>{getCartTotal().toFixed(2)} JOD</span>
               </div>
               {hasPhysicalItems() && (
                 <div className="mb-4 p-3 bg-[#2f2b44] rounded-lg border border-purple-700">

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaPlaystation, FaSteam, FaXbox, FaGooglePlay, FaHeadphones, FaKeyboard, FaMouse, FaShoppingCart } from 'react-icons/fa';
-import { SiEpicgames, SiNintendo } from 'react-icons/si';
+import { FaPlaystation, FaSteam, FaXbox, FaHeadphones, FaKeyboard, FaMouse } from 'react-icons/fa';
 
 const Store = () => {
   const platforms = [
@@ -25,27 +24,6 @@ const Store = () => {
       icon: <FaXbox />,
       color: 'from-green-700 to-green-900',
       borderColor: 'border-green-500'
-    },
-    {
-      id: 'epic-games',
-      name: 'Epic Games',
-      icon: <SiEpicgames />,
-      color: 'from-gray-800 to-black',
-      borderColor: 'border-gray-600'
-    },
-    {
-      id: 'nintendo',
-      name: 'Nintendo',
-      icon: <SiNintendo />,
-      color: 'from-red-600 to-red-800',
-      borderColor: 'border-red-500'
-    },
-    {
-      id: 'google-play',
-      name: 'Google Play',
-      icon: <FaGooglePlay />,
-      color: 'from-green-600 to-green-800',
-      borderColor: 'border-green-400'
     }
   ];
 

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaShoppingCart, FaStar, FaBox, FaCheck, FaGamepad, FaHeadphones } from 'react-icons/fa';
+import { Heart } from 'lucide-react';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 
 const ProductDetails = () => {
   const { categoryId, productId } = useParams();
@@ -13,15 +15,14 @@ const ProductDetails = () => {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [addedToWishlist, setAddedToWishlist] = useState(false);
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const platformColors = {
     'playstation': 'from-blue-700 to-blue-900',
     'steam': 'from-gray-700 to-gray-900',
-    'xbox': 'from-green-700 to-green-900',
-    'epic games': 'from-gray-800 to-black',
-    'nintendo': 'from-red-600 to-red-800',
-    'google play': 'from-green-600 to-green-800'
+    'xbox': 'from-green-700 to-green-900'
   };
 
   const accessoryColors = {
@@ -58,6 +59,13 @@ const ProductDetails = () => {
     fetchProductDetails();
   }, [productId]);
 
+  // Check if product is in wishlist when it loads
+  useEffect(() => {
+    if (product) {
+      setAddedToWishlist(isInWishlist(product._id));
+    }
+  }, [product, isInWishlist]);
+
   const handleAddToCart = () => {
     if (product) {
       const cartItem = {
@@ -76,6 +84,37 @@ const ProductDetails = () => {
       // Reset the "Added to cart" indicator after 2 seconds
       setTimeout(() => {
         setAddedToCart(false);
+      }, 2000);
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    
+    const wishlistItem = {
+      id: product._id,
+      title: product.title,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      description: product.description,
+      category: product.category,
+      platform: product.platform,
+      subcategory: product.subcategory
+    };
+    
+    if (addedToWishlist) {
+      removeFromWishlist(product._id);
+      setAddedToWishlist(false);
+    } else {
+      addToWishlist(wishlistItem);
+      setAddedToWishlist(true);
+      
+      // Show feedback briefly
+      setTimeout(() => {
+        // Don't reset if user removes it during the timeout
+        if (isInWishlist(product._id)) {
+          // Keep it true
+        }
       }, 2000);
     }
   };
@@ -179,7 +218,23 @@ const ProductDetails = () => {
               
               {/* Product Details */}
               <div className="p-8">
-                <h1 className="text-3xl font-bold text-white mb-4">{product.title}</h1>
+                <div className="flex justify-between items-start mb-4">
+                  <h1 className="text-3xl font-bold text-white">{product.title}</h1>
+                  <button
+                    onClick={handleToggleWishlist}
+                    className={`p-2 rounded-full transition-all ${
+                      addedToWishlist 
+                        ? 'bg-red-900/50 text-red-400 hover:bg-red-900/30' 
+                        : 'bg-gray-800/50 text-gray-400 hover:bg-red-900/30 hover:text-red-400'
+                    }`}
+                    aria-label={addedToWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    <Heart 
+                      size={20} 
+                      fill={addedToWishlist ? "currentColor" : "none"} 
+                    />
+                  </button>
+                </div>
                 
                 <div className="flex items-center mb-6">
                   <div className="flex text-yellow-400">
@@ -192,7 +247,7 @@ const ProductDetails = () => {
                 
                 <div className="mb-6">
                   <p className="text-3xl font-bold text-yellow-500">
-                    ${product.price.toFixed(2)}
+                    {product.price.toFixed(2)} JOD
                   </p>
                 </div>
                 

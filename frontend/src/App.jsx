@@ -15,11 +15,13 @@ import TournamentCheckout from "./components/tournaments/TournamentCheckout";
 import NewsPage from "./components/news/NewsPage";
 import NewsDetail from "./components/news/NewsDetail";
 import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import AdminRoutes from "./components/routes/AdminRoutes";
 import AboutUs from "./components/aboutus/AboutUs";
 import AccessoriesProducts from "./components/store/AccessoriesProducts";
 import ProductDetails from "./components/store/ProductDetails";
 import CartPage from "./components/store/CartPage";
+import WishlistPage from "./components/store/WishlistPage";
 
 
 // ⬇️ Nested app to access location
@@ -44,10 +46,11 @@ const AppContent = () => {
         <Route path="/store/accessories/:categoryId" element={<AccessoriesProducts />} />
         <Route path="/store/accessories/:categoryId/product/:productId" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/tournaments/:id" element={<TournamentDetails />} />
         <Route path="/tournaments/:id/checkout" element={<TournamentCheckout />} />
-*        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/aboutus" element={<AboutUs />} />
         <Route path="/news" element={<NewsPage />} />
         <Route path="/news/:id" element={<NewsDetail />} />
@@ -61,9 +64,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <CartProvider>
+      <WishlistProvider>
       <Router>
         <AppContent />
       </Router>
+      </WishlistProvider>
     </CartProvider>
   );
 };

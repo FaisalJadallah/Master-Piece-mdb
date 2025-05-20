@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCreditCard, FaLock, FaPaypal, FaShoppingCart, FaMapMarkerAlt, FaArrowRight, FaPhone, FaTimes } from 'react-icons/fa';
 import { useCart } from '../../context/CartContext';
+import { createOrder, updateOrderToPaid } from '../../utils/api';
 import Swal from 'sweetalert2';
 
 const PaymentGateway = ({ amount, cardDetails, onClose }) => {
@@ -24,12 +25,29 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
     postalCode: '',
     phoneNumber: ''
   });
+  const [formErrors, setFormErrors] = useState({
+    cardNumber: '',
+    cardHolder: '',
+    expiryDate: '',
+    cvv: '',
+    email: '',
+    phoneNumber: ''
+  });
   const [loading, setLoading] = useState(false);
   // Change step to be 'summary', 'address', or 'payment'
   const [step, setStep] = useState('summary');
   
   // Check if there are any physical items (Gaming Accessories) in the cart
   const needsShipping = hasPhysicalItems();
+
+  // Regex patterns for validation
+  const validationPatterns = {
+    cardNumber: /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})$/,
+    expiryDate: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
+    cvv: /^[0-9]{3,4}$/,
+    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    phoneNumber: /^[0-9]{10,14}$/
+  };
 
   // Log for debugging
   useEffect(() => {
@@ -44,6 +62,38 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
       ...prev,
       [name]: value
     }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateField = (name, value) => {
+    if (!value) return "This field is required";
+    
+    if (validationPatterns[name]) {
+      if (!validationPatterns[name].test(value)) {
+        switch (name) {
+          case 'cardNumber':
+            return "Please enter a valid credit card number";
+          case 'expiryDate':
+            return "Use format MM/YY (e.g. 12/25)";
+          case 'cvv':
+            return "CVV must be 3 or 4 digits";
+          case 'email':
+            return "Please enter a valid email address";
+          case 'phoneNumber':
+            return "Please enter a valid phone number";
+          default:
+            return "Invalid format";
+        }
+      }
+    }
+    return "";
   };
 
   const handleContinue = () => {
@@ -62,7 +112,7 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
     e.preventDefault();
     
     // Validate address fields
-    if (!formData.fullName || !formData.address || !formData.city || !formData.country || !formData.postalCode || !formData.phoneNumber) {
+    if (!formData.fullName || !formData.address || !formData.city || !formData.country || !formData.postalCode) {
       // Replace alert with Swal toast for validation error
       Swal.fire({
         toast: true,
@@ -79,6 +129,16 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
       });
       return;
     }
+
+    // Validate phone number if provided
+    const phoneError = validateField('phoneNumber', formData.phoneNumber);
+    if (phoneError) {
+      setFormErrors(prev => ({
+        ...prev,
+        phoneNumber: phoneError
+      }));
+      return;
+    }
     
     // Proceed to payment step
     console.log("Address submitted, proceeding to payment");
@@ -87,46 +147,97 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate payment fields based on payment method
+    let hasErrors = false;
+    const newErrors = { ...formErrors };
+    
+    if (paymentMethod === 'card') {
+      const fieldsToValidate = ['cardNumber', 'cardHolder', 'expiryDate', 'cvv'];
+      
+      fieldsToValidate.forEach(field => {
+        const error = validateField(field, formData[field]);
+        if (error) {
+          newErrors[field] = error;
+          hasErrors = true;
+        }
+      });
+    } else if (paymentMethod === 'paypal') {
+      const error = validateField('email', formData.email);
+      if (error) {
+        newErrors.email = error;
+        hasErrors = true;
+      }
+    }
+    
+    if (hasErrors) {
+      setFormErrors(newErrors);
+      return;
+    }
+    
     setLoading(true);
     try {
-      // Here you would normally send the payment and shipping details to your backend
-      console.log("Processing payment with data:", {
-        payment: {
-          method: paymentMethod,
-          cardDetails: paymentMethod === 'card' ? {
-            cardNumber: formData.cardNumber,
-            cardHolder: formData.cardHolder,
-            expiryDate: formData.expiryDate,
-            cvv: formData.cvv
-          } : {
-            email: formData.email
-          }
-        },
-        shipping: needsShipping ? {
+      // Prepare order items from cart
+      const orderItems = cardDetails.items.map(item => ({
+        name: item.title,
+        quantity: item.quantity,
+        image: item.image,
+        price: item.price,
+        type: item.isPhysical ? 'physical' : 'digital',
+        platform: item.platform || undefined,
+        product: item.id
+      }));
+
+      // Calculate shipping price based on whether there are physical items
+      const shippingPrice = needsShipping ? 5 : 0;
+      
+      // Prepare order data
+      const orderData = {
+        orderItems,
+        paymentMethod,
+        subtotal: amount,
+        shippingPrice,
+        taxPrice: 0, // Assuming no tax for now
+        totalPrice: amount + shippingPrice,
+      };
+
+      // Add shipping address if needed
+      if (needsShipping) {
+        orderData.shippingAddress = {
           fullName: formData.fullName,
           address: formData.address,
-          address2: formData.address2,
+          address2: formData.address2 || '',
           city: formData.city,
           state: formData.state,
           country: formData.country,
           postalCode: formData.postalCode,
           phoneNumber: formData.phoneNumber
-        } : null,
-        order: {
-          items: cardDetails.items,
-          total: amount + (needsShipping ? 5 : 0)
-        }
-      });
+        };
+      }
+
+      // Add payment result
+      const paymentResult = {
+        id: Math.random().toString(36).substring(2, 15),
+        status: 'COMPLETED',
+        update_time: new Date().toISOString(),
+        email_address: paymentMethod === 'paypal' ? formData.email : formData.cardHolder
+      };
+
+      console.log("Creating order with data:", orderData);
       
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create the order
+      const response = await createOrder(orderData);
       
-      // Replace alert with Swal toast
+      // Update order to paid
+      await updateOrderToPaid(response.data._id, paymentResult);
+      
+      // Show success message
       Swal.fire({
         toast: true,
         position: 'top-end',
         icon: 'success',
         title: 'Payment Successful!',
-        text: `Your order #${Math.floor(100000 + Math.random() * 900000)} has been processed`,
+        text: `Your order #${response.data._id.substring(0, 8)} has been processed`,
         showConfirmButton: false,
         timer: 4000,
         timerProgressBar: true,
@@ -145,13 +256,14 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
       onClose();
       navigate('/profile');
     } catch (error) {
-      // Replace error alert with Swal toast
+      console.error('Payment error:', error);
+      // Show error message
       Swal.fire({
         toast: true,
         position: 'top-end',
         icon: 'error',
         title: 'Payment Failed',
-        text: 'Please check your payment details and try again',
+        text: error.response?.data?.message || 'Please check your payment details and try again',
         showConfirmButton: false,
         timer: 4000,
         timerProgressBar: true,
@@ -218,22 +330,22 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                   <div key={index} className="flex justify-between items-center py-3 border-b border-gray-800">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded overflow-hidden border border-gray-700">
-                        <img 
-                          src={item.image} 
-                          alt={item.title}
+                      <img 
+                        src={item.image} 
+                        alt={item.title}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2220%22%20font-size%3D%228%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
-                          }}
-                        />
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2220%22%20font-size%3D%228%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23fff%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
+                        }}
+                      />
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-white">{item.title}</p>
                         <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-yellow-500">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-medium text-yellow-500">{(item.price * item.quantity).toFixed(2)} JOD</p>
                   </div>
                 ))}
               </div>
@@ -241,19 +353,19 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
               <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-4">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-300">Subtotal:</span>
-                  <span className="text-white">${amount.toFixed(2)}</span>
+                  <span className="text-white">{amount.toFixed(2)} JOD</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-300">Shipping:</span>
-                  <span className="text-white">{needsShipping ? '$5.00' : '$0.00'}</span>
+                  <span className="text-white">{needsShipping ? '5.00 JOD' : '0.00 JOD'}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-300">Tax:</span>
-                  <span className="text-white">$0.00</span>
+                  <span className="text-white">0.00 JOD</span>
                 </div>
                 <div className="flex justify-between font-semibold text-lg mt-4 pt-3 border-t border-gray-800">
                   <span className="text-white">Total:</span>
-                  <span className="text-yellow-500">${(amount + (needsShipping ? 5 : 0)).toFixed(2)}</span>
+                  <span className="text-yellow-500">{(amount + (needsShipping ? 5 : 0)).toFixed(2)} JOD</span>
                 </div>
               </div>
               
@@ -306,12 +418,15 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                     type="tel"
                     name="phoneNumber"
                     placeholder="123-456-7890"
-                    className="flex-1 px-4 py-2 bg-gray-800 border-r border-y border-gray-700 rounded-r-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white"
+                    className={`flex-1 px-4 py-2 bg-gray-800 border-r border-y ${formErrors.phoneNumber ? 'border-red-500' : 'border-gray-700'} rounded-r-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white`}
                     required
                     value={formData.phoneNumber}
                     onChange={handleInputChange}
                   />
                 </div>
+                {formErrors.phoneNumber && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.phoneNumber}</p>
+                )}
               </div>
 
               <div className="mb-4">
@@ -439,78 +554,93 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                   <FaPaypal className="mr-2" />
                   PayPal
                 </button>
-              </div>
+            </div>
 
-              <form onSubmit={handleSubmit}>
-                {paymentMethod === 'card' ? (
-                  <>
-                    <div className="mb-4">
+            <form onSubmit={handleSubmit}>
+              {paymentMethod === 'card' ? (
+                <>
+                  <div className="mb-4">
                       <label className="block text-sm mb-1 text-gray-300">Card Number*</label>
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white"
-                        required
-                        value={formData.cardNumber}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm mb-1 text-gray-300">Cardholder Name*</label>
-                      <input
-                        type="text"
-                        name="cardHolder"
-                        placeholder="John Doe"
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white"
-                        required
-                        value={formData.cardHolder}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div>
-                        <label className="block text-sm mb-1 text-gray-300">Expiry Date*</label>
-                        <input
-                          type="text"
-                          name="expiryDate"
-                          placeholder="MM/YY"
-                          className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white"
-                          required
-                          value={formData.expiryDate}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm mb-1 text-gray-300">CVV*</label>
-                        <input
-                          type="text"
-                          name="cvv"
-                          placeholder="123"
-                          className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white"
-                          required
-                          value={formData.cvv}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="mb-6">
-                    <label className="block text-sm mb-1 text-gray-300">PayPal Email*</label>
                     <input
-                      type="email"
-                      name="email"
-                      placeholder="your@email.com"
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white"
+                      type="text"
+                      name="cardNumber"
+                      placeholder="1234 5678 9012 3456"
+                        className={`w-full px-4 py-2 bg-gray-800 border ${formErrors.cardNumber ? 'border-red-500' : 'border-gray-700'} rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white`}
                       required
-                      value={formData.email}
+                      value={formData.cardNumber}
                       onChange={handleInputChange}
                     />
+                    {formErrors.cardNumber && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.cardNumber}</p>
+                    )}
                   </div>
-                )}
+
+                  <div className="mb-4">
+                      <label className="block text-sm mb-1 text-gray-300">Cardholder Name*</label>
+                    <input
+                      type="text"
+                      name="cardHolder"
+                      placeholder="John Doe"
+                        className={`w-full px-4 py-2 bg-gray-800 border ${formErrors.cardHolder ? 'border-red-500' : 'border-gray-700'} rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white`}
+                      required
+                      value={formData.cardHolder}
+                      onChange={handleInputChange}
+                    />
+                    {formErrors.cardHolder && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.cardHolder}</p>
+                    )}
+                  </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label className="block text-sm mb-1 text-gray-300">Expiry Date*</label>
+                      <input
+                        type="text"
+                        name="expiryDate"
+                        placeholder="MM/YY"
+                          className={`w-full px-4 py-2 bg-gray-800 border ${formErrors.expiryDate ? 'border-red-500' : 'border-gray-700'} rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white`}
+                        required
+                        value={formData.expiryDate}
+                        onChange={handleInputChange}
+                      />
+                      {formErrors.expiryDate && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.expiryDate}</p>
+                      )}
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1 text-gray-300">CVV*</label>
+                      <input
+                        type="text"
+                        name="cvv"
+                        placeholder="123"
+                          className={`w-full px-4 py-2 bg-gray-800 border ${formErrors.cvv ? 'border-red-500' : 'border-gray-700'} rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white`}
+                        required
+                        value={formData.cvv}
+                        onChange={handleInputChange}
+                      />
+                      {formErrors.cvv && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.cvv}</p>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                  <div className="mb-6">
+                    <label className="block text-sm mb-1 text-gray-300">PayPal Email*</label>
+                  <input
+                    type="email"
+                    name="email"
+                      placeholder="your@email.com"
+                      className={`w-full px-4 py-2 bg-gray-800 border ${formErrors.email ? 'border-red-500' : 'border-gray-700'} rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-white`}
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                  {formErrors.email && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                  )}
+                </div>
+              )}
 
                 <div className="flex items-center mb-6 p-3 bg-gray-900/50 rounded-lg border border-gray-800">
                   <FaLock className="text-yellow-500 mr-2" />
@@ -519,23 +649,23 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                   </p>
                 </div>
 
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
+              <div className="flex space-x-4">
+                <button
+                  type="button"
                     onClick={() => setStep(needsShipping ? 'address' : 'summary')}
                     className="flex-1 py-3 border border-gray-700 rounded-lg hover:bg-gray-800 transition-colors text-white"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
                     disabled={loading}
                     className={`flex-1 py-3 rounded-lg transition-colors ${
-                      loading
+                    loading
                         ? 'bg-gray-600 cursor-not-allowed'
                         : 'bg-yellow-500 hover:bg-yellow-400 text-black font-bold'
-                    }`}
-                  >
+                  }`}
+                >
                     {loading ? (
                       <div className="flex items-center justify-center">
                         <div className="w-5 h-5 border-2 border-gray-800 border-t-white rounded-full animate-spin mr-2"></div>
@@ -544,9 +674,9 @@ const PaymentGateway = ({ amount, cardDetails, onClose }) => {
                     ) : (
                       'Complete Payment'
                     )}
-                  </button>
-                </div>
-              </form>
+                </button>
+              </div>
+            </form>
             </div>
           </>
         )}

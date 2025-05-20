@@ -18,19 +18,13 @@ const PlatformCards = () => {
   const platformNames = {
     playstation: 'PlayStation',
     steam: 'Steam',
-    xbox: 'Xbox',
-    'epic-games': 'Epic Games',
-    nintendo: 'Nintendo',
-    'google-play': 'Google Play'
+    xbox: 'Xbox'
   };
 
   const platformColors = {
     playstation: 'from-blue-700 to-blue-900',
     steam: 'from-gray-700 to-gray-900',
-    xbox: 'from-green-700 to-green-900',
-    'epic-games': 'from-gray-800 to-black',
-    nintendo: 'from-red-600 to-red-800',
-    'google-play': 'from-green-600 to-green-800'
+    xbox: 'from-green-700 to-green-900'
   };
 
   useEffect(() => {
@@ -106,17 +100,17 @@ const PlatformCards = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div>
               <Link to="/store" className="inline-flex items-center text-gray-300 hover:text-white transition-colors mb-6 md:mb-0">
-                <FaArrowLeft className="mr-2" />
-                Back to Store
-              </Link>
+            <FaArrowLeft className="mr-2" />
+            Back to Store
+          </Link>
               <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 mt-2">
                 {platformNames[platformId] || 'Platform'} <span className="text-yellow-400">Gift Cards</span>
               </h1>
             </div>
-            <button
-              onClick={() => setShowCart(true)}
+          <button
+            onClick={() => setShowCart(true)}
               className="flex items-center space-x-3 bg-yellow-500 text-black px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors duration-300 font-bold"
-            >
+          >
               <FaShoppingCart className="text-xl" />
               <span className="text-lg">{getCartItemsCount()}</span>
             </button>
@@ -152,7 +146,7 @@ const PlatformCards = () => {
             </div>
             <button className="bg-gray-800 p-2 rounded-lg hover:bg-gray-700 transition-colors">
               <FaFilter className="text-gray-400" />
-            </button>
+          </button>
           </div>
         </div>
 
@@ -185,12 +179,12 @@ const PlatformCards = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-xl text-gray-400 mt-4">No products found for this platform.</p>
-                <Link 
-                  to="/store" 
+            <Link 
+              to="/store" 
                   className="inline-block mt-6 px-6 py-3 bg-purple-700 hover:bg-purple-600 text-white font-medium rounded-lg transition-colors"
-                >
-                  Browse Other Platforms
-                </Link>
+            >
+              Browse Other Platforms
+            </Link>
               </>
             )}
           </div>
@@ -229,12 +223,12 @@ const PlatformCards = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-yellow-500">${product.price.toFixed(2)}</span>
                     
-                    <Link 
-                      to={`/store/${platformId}/product/${product._id}`}
+                      <Link 
+                        to={`/store/${platformId}/product/${product._id}`}
                       className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm"
-                    >
-                      Details
-                    </Link>
+                      >
+                        Details
+                      </Link>
                   </div>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { getCurrentUserProfile, updateUserProfile } from "../../utils/api";
+import { getCurrentUserProfile, updateUserProfile, getMyOrders, getUserTournamentHistory } from "../../utils/api";
 import Swal from 'sweetalert2';
-import { FaUser, FaKey, FaHistory, FaShoppingBag, FaGamepad, FaTrophy, FaBoxOpen, FaCalendarAlt, FaEnvelope } from 'react-icons/fa';
+import { FaUser, FaKey, FaHistory, FaShoppingBag, FaGamepad, FaTrophy, FaBoxOpen, FaCalendarAlt, FaEnvelope, FaCog, FaClipboardList } from 'react-icons/fa';
 
 const Profile = () => {
   const [username, setUsername] = useState("");
@@ -18,58 +18,15 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   
-  // Mock purchase history data - this would come from API in a real implementation
-  const [purchaseHistory, setPurchaseHistory] = useState([
-    {
-      id: "ord-123456",
-      date: "2023-12-15",
-      total: 59.99,
-      status: "Completed",
-      items: [
-        { name: "PlayStation Gift Card", price: 49.99, type: "digital", platform: "PlayStation" },
-        { name: "Gaming Mouse", price: 10.00, type: "physical" }
-      ]
-    },
-    {
-      id: "ord-789012",
-      date: "2023-11-28",
-      total: 79.99,
-      status: "Completed",
-      items: [
-        { name: "Xbox Game Pass", price: 14.99, type: "digital", platform: "Xbox" },
-        { name: "Gaming Headset", price: 65.00, type: "physical" }
-      ]
-    },
-    {
-      id: "ord-345678",
-      date: "2023-10-05",
-      total: 29.99,
-      status: "Completed",
-      items: [
-        { name: "Steam Wallet Code", price: 29.99, type: "digital", platform: "Steam" }
-      ]
-    }
-  ]);
+  // Purchase history state
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [orderError, setOrderError] = useState(null);
   
-  // Mock tournament history data
-  const [tournamentHistory, setTournamentHistory] = useState([
-    {
-      id: "trn-123",
-      name: "Winter Gaming Championship",
-      date: "2023-12-10",
-      game: "Call of Duty",
-      position: "Quarter-finalist",
-      prize: null
-    },
-    {
-      id: "trn-456",
-      name: "Fall Esports League",
-      date: "2023-09-22",
-      game: "League of Legends",
-      position: "3rd Place",
-      prize: "$50 Store Credit"
-    }
-  ]);
+  // Tournament history state
+  const [tournamentHistory, setTournamentHistory] = useState([]);
+  const [loadingTournaments, setLoadingTournaments] = useState(false);
+  const [tournamentError, setTournamentError] = useState(null);
   
   // Fetch user data
   useEffect(() => {
@@ -150,6 +107,124 @@ const Profile = () => {
     
     fetchUserProfile();
   }, []);
+
+  // Fetch purchase history when the purchases tab is active
+  useEffect(() => {
+    if (activeTab === "purchases") {
+      fetchPurchaseHistory();
+    }
+  }, [activeTab]);
+
+  // Fetch tournament history when the tournaments tab is active
+  useEffect(() => {
+    if (activeTab === "tournaments") {
+      fetchTournamentHistory();
+    }
+  }, [activeTab]);
+
+  // Function to fetch purchase history
+  const fetchPurchaseHistory = async () => {
+    try {
+      setLoadingOrders(true);
+      setOrderError(null);
+      
+      // Check if token exists
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setOrderError("You are not logged in. Please log in to view your purchase history.");
+        setLoadingOrders(false);
+        return;
+      }
+      
+      console.log("Fetching purchase history...");
+      const response = await getMyOrders();
+      console.log("Orders API response:", response);
+      
+      // Format the order data for display
+      const formattedOrders = response.data.map(order => ({
+        id: order._id,
+        date: new Date(order.createdAt).toISOString().split('T')[0],
+        total: order.totalPrice,
+        status: order.status,
+        items: order.orderItems.map(item => ({
+          name: item.name,
+          price: item.price,
+          type: item.type,
+          platform: item.platform
+        }))
+      }));
+      
+      setPurchaseHistory(formattedOrders);
+      setLoadingOrders(false);
+    } catch (error) {
+      console.error("Error fetching purchase history:", error);
+      
+      // Set error message
+      setOrderError("Failed to load purchase history. Please try again later.");
+      
+      // Show error toast
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Failed to load purchase history',
+        text: error.response?.data?.message || 'Please try again later',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: '#f44336',
+        color: 'white',
+        iconColor: 'white'
+      });
+      
+      setLoadingOrders(false);
+    }
+  };
+
+  // Function to fetch tournament history
+  const fetchTournamentHistory = async () => {
+    try {
+      setLoadingTournaments(true);
+      setTournamentError(null);
+      
+      // Check if token exists
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setTournamentError("You are not logged in. Please log in to view your tournament history.");
+        setLoadingTournaments(false);
+        return;
+      }
+      
+      console.log("Fetching tournament history...");
+      const response = await getUserTournamentHistory();
+      console.log("Tournament API response:", response);
+      
+      setTournamentHistory(response.data);
+      setLoadingTournaments(false);
+    } catch (error) {
+      console.error("Error fetching tournament history:", error);
+      
+      // Set error message
+      setTournamentError("Failed to load tournament history. Please try again later.");
+      
+      // Show error toast
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: 'Failed to load tournament history',
+        text: error.response?.data?.message || 'Please try again later',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: '#f44336',
+        color: 'white',
+        iconColor: 'white'
+      });
+      
+      setLoadingTournaments(false);
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -378,89 +453,101 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-gray-900 via-yellow-900/10 to-black py-12 md:py-16">
+      {/* Hero Section with enhanced design */}
+      <div className="relative bg-gradient-to-br from-gray-900 via-yellow-900/10 to-black py-16 md:py-20">
         <div className="absolute inset-0 bg-[url('/src/assets/Home/hex-pattern.png')] bg-repeat opacity-10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <div className="mb-4">
-            <img
-              src={previewImage || "/images/default-avatar.png"}
-              alt="Profile"
-              className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mx-auto border-2 border-yellow-500 shadow-lg shadow-yellow-500/20"
-            />
+          <div className="mb-6">
+            <div className="relative inline-block group">
+              <img
+                src={previewImage || "/images/default-avatar.png"}
+                alt="Profile"
+                className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mx-auto border-2 border-yellow-500 shadow-lg shadow-yellow-500/20"
+              />
+              <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity duration-300">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                  disabled={submitting}
+                />
+                <FaCog className="text-yellow-500 text-xl" />
+              </label>
+            </div>
           </div>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
             Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">{username}</span>
           </h1>
-          <p className="text-gray-400 mt-2 flex items-center justify-center text-sm md:text-base">
+          <div className="text-gray-400 flex items-center justify-center text-sm md:text-base mb-4 bg-gray-900/30 rounded-full py-2 px-4 inline-flex">
             <FaEnvelope className="mr-2 text-yellow-500" />
             {email}
-          </p>
+          </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-6">
-        <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-t-xl overflow-hidden shadow-xl">
-          <div className="flex flex-wrap text-xs sm:text-sm font-medium">
+      {/* Tab Navigation - with improved design */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
+        <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl overflow-hidden shadow-xl">
+          <div className="flex flex-wrap text-sm sm:text-base font-medium">
             <button 
               onClick={() => setActiveTab("profile")} 
-              className={`flex items-center py-3 px-3 sm:px-6 transition-colors ${
+              className={`flex items-center py-4 px-4 sm:px-8 transition-all duration-300 ${
                 activeTab === "profile" 
                   ? "bg-yellow-500 text-black font-bold" 
                   : "text-gray-300 hover:text-white hover:bg-gray-800"
               }`}
             >
-              <FaUser className="mr-1 sm:mr-2" />
-              <span className="hidden xs:inline">Profile</span> Settings
+              <FaUser className="mr-2 text-lg" />
+              Profile Settings
             </button>
             <button 
               onClick={() => setActiveTab("purchases")} 
-              className={`flex items-center py-3 px-3 sm:px-6 transition-colors ${
+              className={`flex items-center py-4 px-4 sm:px-8 transition-all duration-300 ${
                 activeTab === "purchases" 
                   ? "bg-yellow-500 text-black font-bold" 
                   : "text-gray-300 hover:text-white hover:bg-gray-800"
               }`}
             >
-              <FaHistory className="mr-1 sm:mr-2" />
-              <span className="hidden xs:inline">Purchase</span> History
+              <FaClipboardList className="mr-2 text-lg" />
+              Purchase History
             </button>
             <button 
               onClick={() => setActiveTab("tournaments")} 
-              className={`flex items-center py-3 px-3 sm:px-6 transition-colors ${
+              className={`flex items-center py-4 px-4 sm:px-8 transition-all duration-300 ${
                 activeTab === "tournaments" 
                   ? "bg-yellow-500 text-black font-bold" 
                   : "text-gray-300 hover:text-white hover:bg-gray-800"
               }`}
             >
-              <FaTrophy className="mr-1 sm:mr-2" />
-              <span className="hidden xs:inline">Tournament</span> History
+              <FaTrophy className="mr-2 text-lg" />
+              Tournament History
             </button>
           </div>
         </div>
       </div>
 
-      {/* Tab Content */}
+      {/* Tab Content - with improved spacing and styling */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 border-t-0 rounded-b-xl shadow-xl p-4 sm:p-6 md:p-8">
+        <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl shadow-xl p-6 sm:p-8 md:p-10 mt-6">
           {activeTab === "profile" && (
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-white flex items-center">
-                <FaUser className="mr-2 text-yellow-500" />
+              <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-white flex items-center border-b border-gray-800 pb-4">
+                <FaUser className="mr-3 text-yellow-500" />
                 Edit Profile
               </h2>
-              
+        
               {message.text && (
-                <div className={`mb-4 p-3 rounded ${
-                  message.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                <div className={`mb-6 p-4 rounded-lg ${
+                  message.type === "success" ? "bg-green-600/30 text-green-200 border border-green-500/50" : "bg-red-600/30 text-red-200 border border-red-500/50"
                 }`}>
                   {message.text}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Profile Picture */}
-                <div className="text-center">
+                <div className="text-center bg-gray-900/30 p-6 rounded-xl border border-gray-800">
                   <div className="mb-4">
                     <img
                       src={previewImage || "/images/default-avatar.png"}
@@ -468,8 +555,8 @@ const Profile = () => {
                       className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mx-auto border-2 border-yellow-500"
                     />
                   </div>
-                  <label className="text-yellow-500 cursor-pointer hover:underline inline-block bg-gray-800 px-4 py-2 rounded-lg">
-                    Change Picture
+                  <label className="text-yellow-500 cursor-pointer hover:text-yellow-400 inline-block bg-gray-800 px-6 py-3 rounded-lg transition-colors duration-300 font-medium">
+                    Change Profile Picture
                     <input
                       type="file"
                       accept="image/*"
@@ -604,12 +691,21 @@ const Profile = () => {
 
           {activeTab === "purchases" && (
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-white flex items-center">
-                <FaShoppingBag className="mr-2 text-yellow-500" />
+              <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-white flex items-center border-b border-gray-800 pb-4">
+                <FaShoppingBag className="mr-3 text-yellow-500" />
                 Purchase History
               </h2>
               
-              {purchaseHistory.length === 0 ? (
+              {loadingOrders ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+                </div>
+              ) : orderError ? (
+                <div className="text-center py-12 bg-gray-900/30 rounded-xl border border-gray-800">
+                  <FaHistory className="mx-auto text-4xl text-gray-600 mb-3" />
+                  <p className="text-xl text-gray-400">{orderError}</p>
+                </div>
+              ) : purchaseHistory.length === 0 ? (
                 <div className="text-center py-12 bg-gray-900/30 rounded-xl border border-gray-800">
                   <FaShoppingBag className="mx-auto text-4xl text-gray-600 mb-3" />
                   <p className="text-xl text-gray-400">You haven't made any purchases yet</p>
@@ -634,7 +730,7 @@ const Profile = () => {
                         </div>
                         <div>
                           <p className="text-gray-400 text-xs sm:text-sm">Total</p>
-                          <p className="text-yellow-500 font-bold text-sm sm:text-base">${purchase.total.toFixed(2)}</p>
+                          <p className="text-yellow-500 font-bold text-sm sm:text-base">{purchase.total.toFixed(2)} JOD</p>
                         </div>
                       </div>
                       
@@ -658,7 +754,7 @@ const Profile = () => {
                                   )}
                                 </div>
                               </div>
-                              <p className="text-yellow-500 font-medium text-sm sm:text-base">${item.price.toFixed(2)}</p>
+                              <p className="text-yellow-500 font-medium text-sm sm:text-base">{item.price.toFixed(2)} JOD</p>
                             </div>
                           ))}
                         </div>
@@ -672,12 +768,21 @@ const Profile = () => {
 
           {activeTab === "tournaments" && (
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-white flex items-center">
-                <FaTrophy className="mr-2 text-yellow-500" />
+              <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-white flex items-center border-b border-gray-800 pb-4">
+                <FaTrophy className="mr-3 text-yellow-500" />
                 Tournament History
               </h2>
               
-              {tournamentHistory.length === 0 ? (
+              {loadingTournaments ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+                </div>
+              ) : tournamentError ? (
+                <div className="text-center py-12 bg-gray-900/30 rounded-xl border border-gray-800">
+                  <FaTrophy className="mx-auto text-4xl text-gray-600 mb-3" />
+                  <p className="text-xl text-gray-400">{tournamentError}</p>
+                </div>
+              ) : tournamentHistory.length === 0 ? (
                 <div className="text-center py-12 bg-gray-900/30 rounded-xl border border-gray-800">
                   <FaTrophy className="mx-auto text-4xl text-gray-600 mb-3" />
                   <p className="text-xl text-gray-400">You haven't participated in any tournaments yet</p>

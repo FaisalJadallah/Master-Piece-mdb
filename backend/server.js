@@ -8,6 +8,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const storeRoutes = require("./routes/storeRoutes");
 const productRoutes = require("./routes/productRoutes");
 const newsRoutes = require("./routes/newsRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/upload", uploadRoutes);
 app.use("/store", storeRoutes);
 app.use("/products", productRoutes);
 app.use("/news", newsRoutes);
+app.use("/orders", orderRoutes);
 
 // Debug route for unhandled routes
 app.use((req, res, next) => {
@@ -37,12 +39,13 @@ app.use((req, res, next) => {
   console.log('- /store');
   console.log('- /products');
   console.log('- /news');
+  console.log('- /orders');
   
   res.status(404).json({ 
     message: 'Route not found', 
     requestedRoute: req.originalUrl,
     method: req.method,
-    availableRoutes: ['/users', '/tournaments', '/upload', '/store', '/products', '/news']
+    availableRoutes: ['/users', '/tournaments', '/upload', '/store', '/products', '/news', '/orders']
   });
 });
 

@@ -1,9 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const tournamentController = require('../controllers/tournamentController');
+const authMiddleware = require('../middleares/authMiddleware');
 
 // Get all tournaments
 router.get('/', tournamentController.getAllTournaments);
+
+// Get user's tournaments (requires authentication)
+// This route must come before the /:id route to avoid conflicts
+router.get('/user/history', authMiddleware, tournamentController.getUserTournaments);
 
 // Get a single tournament
 router.get('/:id', tournamentController.getTournamentById);

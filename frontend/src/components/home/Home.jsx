@@ -3,6 +3,7 @@ import videoFile from "../../assets/Home/next-level.mp4";
 import VoltageButton from "../common/VoltageButton";
 import { getLatestNews, getAllTournaments } from "../../utils/api";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [latestNews, setLatestNews] = useState([]);
@@ -11,6 +12,7 @@ const HomePage = () => {
   const [tournaments, setTournaments] = useState([]);
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
   const [tournamentsError, setTournamentsError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLatestNews = async () => {
@@ -82,32 +84,21 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-purple-900/70 to-black/70 z-10"></div>
         <div className="absolute inset-0 bg-[url('/src/assets/Home/hex-pattern.png')] bg-repeat opacity-20 z-10"></div>
 
-        <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4">
-          <div className="max-w-3xl">
-            <h1 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-4">
+        <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 md:px-8">
+          <div className="max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-2 sm:mb-4 tracking-tight">
               GAMING<span className="text-yellow-400">HIVE</span>
             </h1>
-            <div className="h-1 w-24 bg-yellow-400 mx-auto mb-8"></div>
-            <p className="mt-6 text-2xl text-gray-200 leading-relaxed">
+            <div className="h-1 w-16 sm:w-20 md:w-24 bg-yellow-400 mx-auto mb-4 sm:mb-6 md:mb-8"></div>
+            <p className="mt-3 sm:mt-4 md:mt-6 text-base sm:text-xl md:text-2xl text-gray-200 leading-relaxed max-w-full">
               Level up your gaming experience with tournaments, exclusive content, and a vibrant community.
             </p>
-            {/* <div className="mt-12 flex flex-wrap justify-center gap-6">
-              <VoltageButton to="/tournaments">
-                Join Tournaments
-              </VoltageButton>
-              <VoltageButton to="/store">
-                Browse Store
-              </VoltageButton>
-            </div> */}
+            <div className="mt-8 sm:mt-10 md:mt-12 flex flex-wrap justify-center gap-4 sm:gap-6">
+              {/*  */}
+            </div>
           </div>
-          </div>
-          
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
-          <svg className="w-8 h-8 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
         </div>
+          
       </section>
 
       {/* Store Section - Redesigned with Neon Effect */}
@@ -456,63 +447,6 @@ const HomePage = () => {
             <VoltageButton to="/news">
               View All News
             </VoltageButton>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section - New Addition */}
-      <section className="py-24 bg-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/src/assets/Home/grid-pattern.png')] bg-repeat opacity-5"></div>
-        
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="bg-gradient-to-r from-gray-900 to-black p-10 rounded-2xl border border-gray-800 relative overflow-hidden">
-            {/* Glowing effect */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-yellow-500 to-cyan-500"></div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-bold text-white">Join Our <span className="text-yellow-400">Newsletter</span></h2>
-                <p className="mt-4 text-gray-300">
-                  Get exclusive gaming news, tournament updates, and special offers delivered directly to your inbox.
-                </p>
-                <ul className="mt-6 space-y-2">
-                  {["Exclusive gaming deals", "Early access to tournaments", "Special event invitations"].map((item, index) => (
-                    <li key={index} className="flex items-center text-gray-300">
-                      <svg className="w-5 h-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <div className="bg-gradient-to-r from-black to-gray-900 p-6 rounded-xl border border-gray-800">
-                  <form className="space-y-4">
-                    <div>
-                      <label htmlFor="email" className="sr-only">Email Address</label>
-                      <input
-                        type="email"
-                        id="email"
-                        placeholder="Enter your email address"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-yellow-500 transition-colors"
-                      />
-                    </div>
-                    <div className="flex justify-center">
-                      <button
-                        type="submit"
-                        className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-medium rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all"
-                      >
-                        Subscribe Now
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 text-center">
-                      By subscribing, you agree to our Privacy Policy and Terms of Service.
-                    </p>
-                  </form>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
