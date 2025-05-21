@@ -69,4 +69,13 @@ Validate input fields properly on both client and server sides.
 📜 License
 This project is licensed under the MIT License.
 
+
+project document : [Gaming_Hive_Project_Documentation (1).pdf](https://github.com/user-attachments/files/20361315/Gaming_Hive_Project_Documentation.1.pdf)
+
+document brief : [brief.pdf](https://github.com/user-attachments/files/20361323/brief.pdf)
+
+
+
+
+
 🔥 Thank you for using Gaming Hive!
